@@ -1,7 +1,7 @@
-import fs from 'fs';
 import bcrypt from 'bcrypt';
 import User from '../models/userModel.js';
 import PendingUser from '../models/pendingUserModel.js';
+import { sendMail } from '../utils/sendEmail.js';
 
 export const signUp = async (req, res) => {
     let existingUser = await User.exists({_id: req.body.email});
@@ -10,6 +10,7 @@ export const signUp = async (req, res) => {
     }
     try {
         let confirmationCode = await initNewUser(req, res);
+        sendMail(req.body.email, confirmationCode);
         res.status(202).json({msg: "User Added Successfully", confirmationCode });
     } catch (err) {
         console.log(err);
