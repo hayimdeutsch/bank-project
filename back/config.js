@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import nodemailer from "nodemailer";
+import User from "./models/userModel.js";
 
 export const connectDB = async () => {
     const uri = process.env.MONGO_CONNECTION_STRING;

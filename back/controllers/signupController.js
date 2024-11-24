@@ -6,10 +6,10 @@ import { expirationTime } from '../config.js';
 
 export const signUp = async (req, res) => {
     let { email } = req.body;
-    let isExistingUser = await User.exists({_id: email});
-    let isPendingUser = await PendingUser.exists({_id: email});
+    let existingUser = await User.findById(email);
+    let existingPendingUser = await PendingUser.findById(email);
 
-    if (isExistingUser || isPendingUser) {
+    if (existingUser || existingPendingUser) {
         return res.status(409).json({msg: "Email taken"});
     }
 

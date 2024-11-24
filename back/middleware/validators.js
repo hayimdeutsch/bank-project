@@ -1,12 +1,12 @@
-import { body, validationResult } from "express-validator"
-import sendError from "./sendErrors.js";
+import { body } from "express-validator"
+import sendMissingFieldErrors from "./sendMissingFieldErrors.js";
 
 export const loginValidator = [
     body('email', 'Email not provided').isEmail(),
     body('password', 'Missing password field').notEmpty(),
     body('password', 'The minimum password length is 6 characters')
         .isLength({min: 6}), 
-    sendError,
+    sendMissingFieldErrors,
 ];
 
 export const signUpValidator = [
@@ -15,14 +15,14 @@ export const signUpValidator = [
     body('email', 'Invalid email').isEmail().trim(),
     body('phone', 'Incorrect phone format').isMobilePhone(),
     body('password', 'The minimum password length is 6 characters')
-        .isLength({min: 6}),
-    sendError,
+                                                            .isLength({min: 6}),
+    sendMissingFieldErrors,
 ];
 
 export const sendTransactionValidator = [
     body('to', 'Missing recipient email').notEmpty(),
     body('to', 'Recipient not in email format').isEmail(),
     body('amount').notEmpty().isNumeric(),
-    sendError,
+    sendMissingFieldErrors,
 ];
 

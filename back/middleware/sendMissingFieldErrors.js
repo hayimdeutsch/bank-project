@@ -1,6 +1,6 @@
 import { validationResult } from "express-validator";
 
-const sendError = (req, res, next) => {
+const sendMissingFieldErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     let errorFields = [];
@@ -10,4 +10,4 @@ const sendError = (req, res, next) => {
   next();
 }
 
-export default sendError;
+export default sendMissingFieldErrors;

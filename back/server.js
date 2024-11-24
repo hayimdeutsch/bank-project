@@ -3,8 +3,9 @@ import 'dotenv/config.js';
 import express from "express";
 import cookieParser from 'cookie-parser';
 
-import userRouter from './routes/userRoutes.js';
-import signUpRouter from './routes/signupRoutes.js';
+import userRouter from './routes/userRouter.js';
+import signUpRouter from './routes/signupRouter.js';
+import adminRouter from './routes/adminRouter.js';
 
 import { logIn, logOut } from './controllers/loginController.js';
 import { tokenRefresh } from './controllers/refreshController.js';
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 router.post("/login", loginValidator, logIn);
+router.use("/admin", adminRouter);
 router.use("/user", userRouter);
 router.use("/signup", signUpRouter);
 router.post("/refresh", tokenRefresh);
