@@ -14,3 +14,7 @@ export const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     }
 });
+
+export const expirationTime = 5 * 60 * 1000;
+
+export const cleanUpInterval = 60 * 60 * 1000;

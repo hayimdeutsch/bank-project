@@ -21,20 +21,20 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    activated: {
-        type: Boolean,
-        default: false,
-    },
     balance: {
         type: Number,
-        default: 1000
+        default: () => (Math.floor(1000 + Math.random() * 9000).toString())
     },
     transactions: [{
         type: mongoose.Schema.Types.ObjectId,
         required: false,
         ref: 'Transaction'
     }]
-});
+},
+{
+    timestamps: true
+}
+);
   
 const User = mongoose.model('User', UserSchema);
 

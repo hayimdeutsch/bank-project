@@ -21,9 +21,6 @@ export const logIn = async (req, res) => {
         return res.status(400).json({msg: "Incorrect password"});
     }
 
-    if (!user.activated) {
-        return res.status(400).json({msg: "User not activated"});
-    }
     let tokensObj = generateTokens(email);
 
     return res.status(200).json(tokensObj);

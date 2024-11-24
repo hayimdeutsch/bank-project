@@ -5,8 +5,8 @@ import bankRouter from './routes/loginRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import signUpRouter from './routes/signupRoutes.js';
 import { tokenRefresh } from './controllers/refreshController.js';
-import { connectDB } from './config.js';
-
+import { cleanUpInterval, connectDB } from './config.js';
+import removeInactiveUsers from './utils/runCleanUp.js';
 const app = express();
 
 app.use(express.json());
@@ -21,3 +21,5 @@ app.listen(port, async () => {
     await connectDB();
     console.log(`listening on port ${port}`);
 })
+
+setInterval(removeInactiveUsers, cleanUpInterval);

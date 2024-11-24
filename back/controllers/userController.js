@@ -2,12 +2,29 @@ import User from '../models/userModel.js';
 import mongoose from 'mongoose';
 import Transaction from '../models/transactionModel.js';
 
+export const getInfo = async (req, res) => {
+    try {
+        const user = await User.findById(req.email);
+        let userInfo = {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user._id,
+            phone: user.phone
+        };
+        return res.status(200).json({msg: "Success", userInfo});
+    } catch (err) {
+        console.log(err);
+        return res.status (500).json({msg: "Internal server error"});
+    }
+}
+
 export const getBalance = async (req, res) => {
     try {
         let userData = await User.findById(req.email);
         res.status(200).json({balance: userData.balance});
     } catch(err) {
-        return res.status(400).json({message: err.message})
+        console.log(err);
+        return res.status(500).json({message: err.message})
     }
 }
 

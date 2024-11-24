@@ -1,25 +1,40 @@
 import mongoose from "mongoose";
+import { expirationTime } from "../config.js";
 
-const activationExpirationDuration = 5 * 60 * 1000;
-
-const pendingSchema =  new mongoose.Schema(
+const pendingUserSchema =  new mongoose.Schema(
     {
         _id: {
             type: String,
-            match: /^[0-9]{6}$/
+            match: /^\S+@\S+\.\S+$/,
         },
-        email: {
+        confirmationCode: {
+            type: String,
+            match: /^[0-9]{6}$/,
+            index: true,
+        },
+        firstName: {
             type: String,
             required: true,
-            match: /^\S+@\S+\.\S+$/
+        },
+        lastName: {
+            type: String,
+            required: true,
+        },
+        phone: {
+            type: String,
+            required: true,
+        },
+        password: {
+            type: String,
+            required: true,
         },
         expiration: {
             type: Date,
-            default: () => (Date.now() + activationExpirationDuration),
+            default: () => (Date.now() + expirationTime),
         }
     }
 );
 
-const PendingUser = mongoose.model('PendingUser', pendingSchema);
+const PendingUser = mongoose.model('PendingUser', pendingUserSchema);
 
 export default PendingUser;
