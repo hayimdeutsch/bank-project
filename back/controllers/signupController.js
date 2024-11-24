@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import User from '../models/userModel.js';
 import PendingUser from '../models/pendingUserModel.js';
-import { sendMail } from '../utils/sendEmail.js';
+import { sendConfirmationCode } from '../utils/sendEmail.js';
 import { expirationTime } from '../config.js';
 
 export const signUp = async (req, res) => {
@@ -15,7 +15,7 @@ export const signUp = async (req, res) => {
 
     try {
         let confirmationCode = await initNewUser(req, res);
-        sendMail(email, confirmationCode);
+        sendConfirmationCode(email, confirmationCode);
         res.status(202).json({msg: "User Added Successfully", confirmationCode });
     } catch (err) {
         console.log(err);
@@ -67,7 +67,7 @@ export const resendActivation = async (req, res) => {
 
     const extendedExpTime = calculateExpirationTime();
     const otp = generateConfirmationCode();
-    sendMail(email, otp);
+    sendConfirmationCode(email, otp);
     console.log(email, extendedExpTime, otp)
     try {
         await PendingUser.findByIdAndUpdate( email, 

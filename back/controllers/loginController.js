@@ -21,7 +21,13 @@ export const logIn = async (req, res) => {
         return res.status(400).json({msg: "Incorrect password"});
     }
 
-    let tokensObj = generateTokens(email);
+    generateTokens(res, email);
 
-    return res.status(200).json(tokensObj);
+    return res.status(200).json({msg: "Successful login"});
+}
+
+export const logOut = async (req, res) => {
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.status(200).json({msg: "Successfully logged out"});
 }

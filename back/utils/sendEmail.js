@@ -5,7 +5,7 @@ let mailOptions = {
   subject: 'Mo Bank Confirmation Code',
 };
 
-export const sendMail = function (recipientEmail, code) {
+export const sendConfirmationCode = function (recipientEmail, code) {
   mailOptions.to = recipientEmail;
   mailOptions.text = `Your confirmation code is ${code}.\nIt will be valid for`+ 
             ` ${process.env.CONFIRMATION_CODE_VALIDATION_TIME} minutes.`;

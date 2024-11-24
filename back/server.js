@@ -1,19 +1,31 @@
 import 'dotenv/config.js';
 
 import express from "express";
-import bankRouter from './routes/loginRoutes.js';
+import cookieParser from 'cookie-parser';
+
 import userRouter from './routes/userRoutes.js';
 import signUpRouter from './routes/signupRoutes.js';
+
+import { logIn, logOut } from './controllers/loginController.js';
 import { tokenRefresh } from './controllers/refreshController.js';
+import { loginValidator } from './middleware/validators.js';
 import { cleanUpInterval, connectDB } from './config.js';
 import removeInactiveUsers from './utils/runCleanUp.js';
+
 const app = express();
 
+const router = express.Router();
+
 app.use(express.json());
-app.use("/api/v1", bankRouter);
-app.use("/api/v1/user", userRouter);
-app.use("/api/v1/signup", signUpRouter);
-app.post("/api/v1/refresh", tokenRefresh);
+app.use(cookieParser());
+
+router.post("/login", loginValidator, logIn);
+router.use("/user", userRouter);
+router.use("/signup", signUpRouter);
+router.post("/refresh", tokenRefresh);
+router.post("/logout", logOut);
+
+app.use("/api/v1", router);
 
 const port = process.env.PORT || 3000;
 
