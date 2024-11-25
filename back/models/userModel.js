@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Decimal128, ObjectId } from "mongoose";
 
 const UserSchema = new mongoose.Schema({
     _id: {
@@ -22,11 +23,12 @@ const UserSchema = new mongoose.Schema({
         required: true,
     },
     balance: {
-        type: Number,
-        default: () => (Math.floor(1000 + Math.random() * 9000).toString())
+        type: Decimal128,
+        default: new Decimal128("0.00"),
+        get: (num) => new Number(num).toFixed(2).toString()
     },
     transactions: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: ObjectId,
         required: false,
         ref: 'Transaction'
     }]
@@ -35,7 +37,7 @@ const UserSchema = new mongoose.Schema({
     timestamps: true
 }
 );
-  
+
 const User = mongoose.model('User', UserSchema);
 
 export default User;

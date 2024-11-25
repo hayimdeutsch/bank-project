@@ -30,7 +30,14 @@ export const getBalance = async (req, res) => {
 
 export const getTransactions = async (req, res) => {
     try {
-        let userTransactions = await User.findById(req.email, "transactions -_id").populate('transactions', '-_id -__v' ).exec();
+        let userTransactions = 
+        await User.findById(req.email, "transactions -_id")
+        .populate({
+            path: 'transactions',
+            select: 'from to amount -_id',
+            options: { getters: true },
+    })
+        .exec();
         res.status(200).json({transactions: userTransactions.transactions});
     } catch(err) {
         return res.status(500).json({message: err.message})
@@ -40,6 +47,11 @@ export const getTransactions = async (req, res) => {
 export const postTransactions = async (req, res) => {
     let { to, amount } = req.body;
     let from = req.email;
+
+    if (from === to) {
+        return res.status(400).json({ msg: "You can't send money to yourself" })
+    }
+
     try {
         from = await User.findById(from);
         to = await User.findById(to);
@@ -52,12 +64,12 @@ export const postTransactions = async (req, res) => {
     if (from.balance < amount) {
         return res.status(400).json({msg: "Insufficient funds"});
     }
-    let transaction = new Transaction(
-        {
-            from: from._id, 
-            to: to._id, 
-            amount
-        });
+    let transaction = new Transaction({
+        from: from._id, 
+        to: to._id, 
+        amount
+    });
+
     let session = await mongoose.connection.startSession();
     try {
         session.startTransaction();
@@ -74,12 +86,12 @@ export const postTransactions = async (req, res) => {
             }, {session});
 
         await session.commitTransaction()
-        session.endSession()
         res.status(200).json({msg: "Successful transaction"});
     } catch (err) {
-        await session.abortTransaction();
-        session.endSession();
         console.log(err)
+        await session.abortTransaction();
         res.status(500).json({msg: "Internal Server Error"})
+    } finally {
+        session.endSession()
     }
 }

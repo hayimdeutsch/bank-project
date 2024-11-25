@@ -22,7 +22,8 @@ export const signUpValidator = [
 export const sendTransactionValidator = [
     body('to', 'Missing recipient email').notEmpty(),
     body('to', 'Recipient not in email format').isEmail(),
-    body('amount').notEmpty().isNumeric(),
+    body('amount').notEmpty().isNumeric({ gt: 0 }),
     sendMissingFieldErrors,
 ];
+
 

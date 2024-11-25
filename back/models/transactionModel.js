@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { Decimal128 } from "mongoose";
 
-const transactionSchema = new mongoose.Schema({
+const TransactionSchema = new mongoose.Schema({
     from: {
         type: String,
         required: true,
@@ -12,15 +13,25 @@ const transactionSchema = new mongoose.Schema({
         match: /^\S+@\S+\.\S+$/
     },
     amount: {
-        type: Number,
+        type: Decimal128,
         required: true,
-        min: 0
+        validate: {
+            validator: (v) => v > 0,
+            message: "Transaction amount must be more than 0",
+        },
     },
 },  
 {
     timestamps: { createdAt: 'time', updatedAt: false }
 });
 
-const Transaction = mongoose.model('Transaction', transactionSchema);
+TransactionSchema.set('toJSON', {
+    transform: (doc, ret) => {
+        ret.amount = new Number(ret.amount).toFixed(2);
+      return ret;
+    },
+  });
+
+const Transaction = mongoose.model('Transaction', TransactionSchema);
 
 export default Transaction;

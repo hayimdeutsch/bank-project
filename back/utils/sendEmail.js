@@ -1,20 +1,27 @@
-import { transporter } from "../config.js";
+import { codeExpiryMins, transporter } from "../config.js";
 
-let mailOptions = {
-  from: process.env.EMAIL_USERNAME,
-  subject: 'Mo Bank Confirmation Code',
-};
+
 
 export const sendConfirmationCode = function (recipientEmail, code) {
-  mailOptions.to = recipientEmail;
-  mailOptions.text = `Your confirmation code is ${code}.\nIt will be valid for`+ 
-            ` ${process.env.CONFIRMATION_CODE_VALIDATION_TIME} minutes.`;
+  let text = `Your confirmation code is ${code}.\nIt will be valid for`+ 
+            ` ${codeExpiryMins} minutes.`;
+  sendEmail(recipientEmail, "MoBank Confirmation Code", text);
+}
+
+export const sendEmail = function (recipient, subject, bodyText) {
+  let mailOptions = {
+    from: process.env.EMAIL_USERNAME,
+    subject: subject,
+    to: recipient, 
+    text: bodyText
+  };
 
   transporter.sendMail(mailOptions, function(error, info){
-    if (error) {
-        console.log(error);
-    } else {
-        console.log('Email sent: ' + info.response);
+      if (error) {
+          console.log(error);
+      } else {
+          console.log('Email sent: ' + info.response);
+      }
     }
-});
+  );
 }

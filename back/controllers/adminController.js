@@ -1,16 +1,44 @@
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+
 import User from "../models/userModel.js";
 import Transaction from "../models/transactionModel.js";
-import mongoose from "mongoose";
+import generateTokens from "../utils/generateTokens.js";
+
+export const loginAdmin = async (req, res) => {
+  let {email, password} = req.body;
+  let user = null;
+
+  if (email !== process.env.ADMIN_EMAIL) {
+    return res.status(403).json({msg: "Access denied only admin can log in"})
+  }
+
+  try {
+      user = await User.findById(email);
+  } catch (err) {
+      console.log(err);
+      return res.status(500).json({msg: "Internal server error"})
+  }
+  
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+      return res.status(400).json({msg: "Incorrect password"});
+  }
+
+  generateTokens(res, email);
+
+  return res.status(200).json({msg: "Successful login"});
+}
 
 export const getUsersAutocomplete = async (req, res) => {
   try {
-    const searchTerm = req.query.q;
-    if (!searchTerm) {
+    const search = req.query.q;
+    if (!search) {
       return res.status(400).json({ msg: "Search term is required" });
     }
 
     const results = await User.find(
-      { _id: { $regex: `^${searchTerm}`, $options: 'i' } }
+      { _id: { $regex: `^${search}`, $options: 'i' } }
     )
     .limit(10)
     .select({ _id: 1 })
@@ -48,13 +76,13 @@ export const postUserDeposit = async (req, res) => {
           $push: {transactions: transaction._id}
       }, {session});
       await session.commitTransaction()
-      session.endSession()
-      res.status(200).json({msg: "Successful transaction"});
+      res.status(200).json({msg: "Successful deposit"});
   } catch (err) {
     console.log(err);
     await session.abortTransaction();
-    session.endSession();
     res.status(500).json({msg: "Internal Server Error"})
+  } finally {
+    session.endSession();
   }
 }
 

@@ -16,6 +16,7 @@ export const transporter = nodemailer.createTransport({
     }
 });
 
-export const expirationTime = 5 * 60 * 1000;
+export const codeExpiryMins = 5;
+export const expirationTime = codeExpiryMins * 60 * 1000;
 
 export const cleanUpInterval = 60 * 60 * 1000;
