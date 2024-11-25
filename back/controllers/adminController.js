@@ -86,3 +86,8 @@ export const postUserDeposit = async (req, res) => {
   }
 }
 
+export const logoutAdmin = (req, res) => {
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.status(200).json({msg: "Successfully logged out"});
+}

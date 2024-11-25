@@ -4,11 +4,11 @@ import {
     getBalance, 
     getTransactions, 
     postTransactions } from "../controllers/userController.js";
-import { authenticateToken } from "../middleware/authenticateAccessToken.js";
+import authenticateAccessToken from "../middleware/authenticateAccessToken.js";
 import { sendTransactionValidator } from "../middleware/validators.js";
 
 const userRouter = Router();
-userRouter.use(authenticateToken);
+userRouter.use(authenticateAccessToken);
 
 userRouter.get("/info", getInfo);
 userRouter.get("/balance", getBalance);

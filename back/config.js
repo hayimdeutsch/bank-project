@@ -1,14 +1,14 @@
 import mongoose from "mongoose";
 import nodemailer from "nodemailer";
-import User from "./models/userModel.js";
 
-export const connectDB = async () => {
+const connectDB = async () => {
     const uri = process.env.MONGO_CONNECTION_STRING;
     const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
     await mongoose.connect(uri, clientOptions);
+    console.log("Connected to MongoDB")
 }
 
-export const transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL_USERNAME,
@@ -16,7 +16,21 @@ export const transporter = nodemailer.createTransport({
     }
 });
 
-export const codeExpiryMins = 5;
-export const expirationTime = codeExpiryMins * 60 * 1000;
+const corsOptions = {
+    credentials: true,
+}
 
-export const cleanUpInterval = 60 * 60 * 1000;
+const codeExpiryMins = 5;
+
+const expirationTime = codeExpiryMins * 60 * 1000;
+
+const cleanUpInterval = 60 * 60 * 1000;
+
+export { 
+    connectDB, 
+    transporter, 
+    codeExpiryMins, 
+    expirationTime, 
+    cleanUpInterval,
+    corsOptions
+};

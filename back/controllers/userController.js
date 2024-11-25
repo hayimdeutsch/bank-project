@@ -4,7 +4,7 @@ import Transaction from '../models/transactionModel.js';
 
 export const getInfo = async (req, res) => {
     try {
-        const user = await User.findById(req.email);
+        const user = await User.findById(req.body.email);
         let userInfo = {
             firstName: user.firstName,
             lastName: user.lastName,
@@ -20,7 +20,7 @@ export const getInfo = async (req, res) => {
 
 export const getBalance = async (req, res) => {
     try {
-        let userData = await User.findById(req.email);
+        let userData = await User.findById(req.body.email);
         res.status(200).json({balance: userData.balance});
     } catch(err) {
         console.log(err);
@@ -31,7 +31,7 @@ export const getBalance = async (req, res) => {
 export const getTransactions = async (req, res) => {
     try {
         let userTransactions = 
-        await User.findById(req.email, "transactions -_id")
+        await User.findById(req.body.email, "transactions -_id")
         .populate({
             path: 'transactions',
             select: 'from to amount -_id',
@@ -45,15 +45,16 @@ export const getTransactions = async (req, res) => {
 }
 
 export const postTransactions = async (req, res) => {
-    let { to, amount } = req.body;
-    let from = req.email;
+    let { email, to, amount } = req.body;
 
-    if (from === to) {
-        return res.status(400).json({ msg: "You can't send money to yourself" })
+    if (email == to) {
+        return res.status(400).json({ msg: "You can't send money to yourself" });
     }
 
+    let from = null;
+    
     try {
-        from = await User.findById(from);
+        from = await User.findById(email);
         to = await User.findById(to);
     } catch (err) {
         return res.status(500).json({msg: "Internal Server Error"});

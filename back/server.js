@@ -1,7 +1,8 @@
 import 'dotenv/config.js';
 
-import express from "express";
+import express, { urlencoded } from "express";
 import cookieParser from 'cookie-parser';
+import cors from "cors";
 
 import userRouter from './routes/userRouter.js';
 import signUpRouter from './routes/signupRouter.js';
@@ -10,7 +11,7 @@ import adminRouter from './routes/adminRouter.js';
 import { logIn, logOut } from './controllers/loginController.js';
 import { tokenRefresh } from './controllers/refreshController.js';
 import { loginValidator } from './middleware/validators.js';
-import { cleanUpInterval, connectDB } from './config.js';
+import { cleanUpInterval, connectDB, corsOptions } from './config.js';
 import removeInactiveUsers from './utils/runCleanUp.js';
 
 const app = express();
@@ -19,6 +20,7 @@ const router = express.Router();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors(corsOptions));
 
 router.post("/login", loginValidator, logIn);
 router.use("/admin", adminRouter);
