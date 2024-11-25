@@ -2,9 +2,8 @@ import mongoose from "mongoose";
 import nodemailer from "nodemailer";
 
 const connectDB = async () => {
-    const uri = process.env.MONGO_CONNECTION_STRING;
     const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
-    await mongoose.connect(uri, clientOptions);
+    await mongoose.connect(process.env.MONGO_CONNECTION_STRING, clientOptions);
     console.log("Connected to MongoDB")
 }
 
