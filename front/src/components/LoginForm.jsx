@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import handleFormSubmit from "../hooks/handleFormSubmit";
+import handleFormSubmit from "../hooks/useFormSubmit";
 
 export default function LoginForm({submitTo, next}) {
   let [formData, setFormData] = useState( {

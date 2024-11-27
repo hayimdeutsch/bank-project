@@ -17,10 +17,8 @@ export default function useFetch(endpoint) {
         setData(newData);
         setError(null);
       } catch (error) {
-        if (error.name === "AbortError") {
           setError(error);
           setLoading(false);
-        }
       }
     };
     fetchData();
