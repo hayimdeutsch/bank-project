@@ -1,29 +1,35 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import handleFormSubmit from "../hooks/useFormSubmit";
+import sendForm from "../utils/sendForm";
 
 export default function LoginForm({submitTo, next}) {
   let [formData, setFormData] = useState( {
     email: '',
     password: ''
   });
+  let [error, setError] = useState(null);
   let navigate = useNavigate();
 
-
   const handleChange = (event) => {
+    setError(null);
     let {name, value} = event.target;
     setFormData((prevState) => ({...prevState, [name]: value}))
   }
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (e) => {
     try {
-      let res = await handleFormSubmit(event, submitTo);
-      sessionStorage.setItem("accessToken", res.accessToken);
-      console.log(res);
-      navigate(next, {replace: true})
-    } catch (err) {
-      console.log(err);
+      let response = await sendForm(e, submitTo);
+      sessionStorage.setItem('accessToken', response?.data?.accessToken);
+      localStorage.setItem('refreshToken', response?.data?.refreshToken);
+      localStorage.setItem('loggedIn', 'true');
+      navigate(next);
+    } catch (error) {
+      if (error?.response && error?.response?.status === 400) {
+          setError("Email or Password are Inccorect");
+      } else {
+        navigate("/")
+      }
     }
   }
 
@@ -38,6 +44,7 @@ export default function LoginForm({submitTo, next}) {
 
           <button type="submit">Login</button>
       </form>
+      {error && <div className="errorMsg">{error}</div>}
       <div className="signup-link">
           <p>Don't have an account? <a href="/signup">Sign up here</a></p>
       </div> 

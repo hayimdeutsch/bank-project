@@ -11,13 +11,13 @@ export default function TransferForm() {
 
   const handleSubmit = async (event) => {
     try {
-      let res = await handleFormSubmit(event, submitTo);
+      let res = await useFormSubmit(event, submitTo);
       console.log(res);
     } catch (err) {
       console.log(err);
     }
   }
-  
+
   return (
     <div className="TransferForm">
     <form onSubmit={handleSubmit}>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import handleFormSubmit from "../hooks/useFormSubmit"
+import sendForm from "../utils/sendForm"
 
 export default function SignupForm() {
   let [formData, setFormData] = {
@@ -17,8 +17,12 @@ export default function SignupForm() {
     setFormData((prevState) => ({...prevState, [name]: value}))
   }
 
-  const handleSubmit = (event) => {
-    handleFormSubmit(event, submitTo);
+  const handleSubmit = async (event) => {
+    try {
+      let response = await sendForm(event, submitTo);
+    } catch (error) {
+
+    }
   }
 
   return (

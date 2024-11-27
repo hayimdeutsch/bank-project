@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import useFetch from "../hooks/useFetch";
-import handleFormSubmit from "../hooks/useFormSubmit";
+import handleFormSubmit from "../utils/sendForm";
 import ActivityTable from "../components/ActivityTable";
 import TransferForm from "../components/TransferForm";
 

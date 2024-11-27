@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import generateTokens from '../utils/generateTokens.js';
 
 export const tokenRefresh = (req, res, next) => {
-    let { oldRefreshToken } = req.cookies.refreshToken;
+    let { oldRefreshToken } = req.body.refreshToken;
     let decoded = null;
     if (!oldRefreshToken) {
         return res.status(401).json({ msg: 'Bad Request: No token provided' });
