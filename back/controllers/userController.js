@@ -11,7 +11,7 @@ export const getInfo = async (req, res) => {
             email: user._id,
             phone: user.phone
         };
-        return res.status(200).json({msg: "Success", userInfo});
+        return res.status(200).json({userInfo});
     } catch (err) {
         console.log(err);
         return res.status (500).json({msg: "Internal server error"});
@@ -34,7 +34,7 @@ export const getTransactions = async (req, res) => {
         await User.findById(req.body.email, "transactions -_id")
         .populate({
             path: 'transactions',
-            select: 'from to amount -_id',
+            select: 'from to amount time -_id',
             options: { getters: true },
     })
         .exec();
