@@ -14,9 +14,13 @@ export const signUp = async (req, res) => {
     }
 
     try {
-        let confirmationCode = await initNewUser(req, res);
-        sendConfirmationCode(email, confirmationCode);
-        res.status(202).json({msg: "User Added Successfully", confirmationCode });
+        let newPendingUser = await initNewUser(req, res);
+
+        sendConfirmationCode(email, newPendingUser.confirmationCode);
+        res.status(202).json({
+            msg: "User Added Successfully", 
+            confirmationCode: newPendingUser.confirmationCode 
+        });
     } catch (err) {
         console.log(err);
         return res.status(500).json({msg: "Internal server error"})
@@ -42,15 +46,15 @@ export const confirmActivation = async (req, res) => {
         phone: pendingUser.phone,
         password: pendingUser.password   
     });
+    console.log(newUser);
 
     try {
         await PendingUser.deleteOne({confirmationCode: code});
         await newUser.save();
+        res.status(200).json({msg: "Account Confirmed"});
     } catch (err) {
         res.status(500).json({msg: err.msg})
     }
-
-    res.status(200).json({msg: "Account Confirmed"});
 }
 
 export const resendActivation = async (req, res) => {
@@ -101,7 +105,7 @@ async function initNewUser(req) {
         password: hashedPassword
     });
     await newPendingUser.save();
-    return otp;
+    return newPendingUser;
 }
 
 async function hashPassword(password) {

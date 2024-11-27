@@ -1,7 +1,5 @@
 import { codeExpiryMins, transporter } from "../config.js";
 
-
-
 export const sendConfirmationCode = function (recipientEmail, code) {
   let text = `Your confirmation code is ${code}.\nIt will be valid for`+ 
             ` ${codeExpiryMins} minutes.`;

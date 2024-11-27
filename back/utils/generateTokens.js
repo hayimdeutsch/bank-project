@@ -20,6 +20,7 @@ const generateTokens = function (res, email) {
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
   })
+  return ({ accessToken, refreshToken });
 }
 
 export default generateTokens;

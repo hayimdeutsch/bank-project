@@ -24,7 +24,7 @@ const UserSchema = new mongoose.Schema({
     },
     balance: {
         type: Decimal128,
-        default: new Decimal128("0.00"),
+        default: 0,
         get: (num) => new Number(num).toFixed(2).toString()
     },
     transactions: [{

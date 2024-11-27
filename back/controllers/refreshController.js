@@ -15,5 +15,5 @@ export const tokenRefresh = (req, res, next) => {
 
     let tokensObj = generateTokens(req, decoded.email);
 
-    res.status(200).json({msg: "Successfully refreshed tokens"});
+    res.status(200).json({msg: "Successfully refreshed tokens", ...tokensObj});
 }

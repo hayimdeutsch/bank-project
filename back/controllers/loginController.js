@@ -21,9 +21,9 @@ export const logIn = async (req, res) => {
         return res.status(400).json({msg: "Incorrect password"});
     }
 
-    generateTokens(res, email);
+    let tokens = generateTokens(res, email);
 
-    return res.status(200).json({msg: "Successful login"});
+    return res.status(200).json({msg: "Successful login", ...tokens});
 }
 
 export const logOut = async (req, res) => {
