@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import useAxiosProtected from "./useAxiosProtected";
 
 export default function useFetch(endpoint) {
+  let privateAxios = useAxiosProtected();
   const [data, setData] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -9,12 +11,11 @@ export default function useFetch(endpoint) {
     let abortController = new AbortController();
     const fetchData = async () => {
       try {
-        const response = await fetch(endpoint, {
+        const response = await privateAxios(endpoint, {
           signal: abortController.signal,
         });
-        const newData = await response.json();
         setLoading(false);
-        setData(newData);
+        setData(response.data);
         setError(null);
       } catch (error) {
           setError(error);

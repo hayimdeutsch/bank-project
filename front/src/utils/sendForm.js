@@ -1,6 +1,6 @@
-import axios from "./axios";
+import axios from 'axios'
 
-export default sendForm = async (e, endpoint) => {
+const sendForm = async (e, endpoint) => {
   e.preventDefault();
   let data = Object.fromEntries(new FormData(e.target).entries());
   let response = await axios.post(endpoint, data, { headers: 
@@ -8,3 +8,5 @@ export default sendForm = async (e, endpoint) => {
   });
   return response;
 }
+
+export default sendForm;

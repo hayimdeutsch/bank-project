@@ -20,14 +20,22 @@ export default function LoginForm({submitTo, next}) {
   const handleSubmit = async (e) => {
     try {
       let response = await sendForm(e, submitTo);
-      sessionStorage.setItem('accessToken', response?.data?.accessToken);
-      localStorage.setItem('refreshToken', response?.data?.refreshToken);
+      console.log(response?.data);
+      const accessToken = response?.data?.accessToken;
+      const refreshToken = response?.data?.refreshToken;
+      console.log(accessToken, refreshToken);
+      sessionStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('loggedIn', 'true');
       navigate(next);
     } catch (error) {
       if (error?.response && error?.response?.status === 400) {
           setError("Email or Password are Inccorect");
       } else {
+        setFormData({
+          email: '',
+          password: ''
+        })
         navigate("/")
       }
     }
