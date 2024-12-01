@@ -1,29 +1,28 @@
-import { useState } from "react";
-
-import useAxiosProtected from "../hooks/useAxiosProtected";
-import useFetch from "../hooks/useFetch";
-import sendForm from "../utils/sendForm";
 import ActivityTable from "../components/ActivityTable";
-import TransferForm from "../components/TransferForm";
+import UserInfo from '../components/UserInfo';
+import TransferForm from '../components/TransferForm'
+import { Stack } from "@mui/material";
+import { useAuthContext } from "../context/UserContext";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
+  let { activeUser } = useAuthContext();
+  let navigate = useNavigate();
 
-  let {loading: l1, error: e1, data: d1 } = useFetch("api/v1/user/info");
-  let {loading: l2, error: e2, data: d2 } = useFetch("api/v1/user/balance");
+  useEffect(() => {
+    if (!activeUser?.user) {
+      navigate("/");
+    }
+  }, [])
 
   return (
-    <div className="Dashboard">
-      <h1>Dashboard</h1>
-      <div>User Info
-        {d1 && <div>{JSON.stringify(d1)}</div>}
-        { e1 && <p>Error</p> }
-      </div>
-      <div>Balance
-        {d2 && <div>{JSON.stringify(d2)}</div>}
-        { e2 && <p>Error</p> }
-      </div>
-      <ActivityTable url={"api/v1/user/transactions"}/>
-
+    <div className="Dashboard"> 
+      <Stack direction="row" alignItems="stretch" spacing={2} border={1} justifyContent={"space-around"} >
+      <UserInfo />
+      <TransferForm />
+      </Stack>
+      <ActivityTable />
     </div>
   );
 }

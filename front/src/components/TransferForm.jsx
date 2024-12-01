@@ -1,4 +1,19 @@
+import { useState } from 'react';
+
+import submitForm from '../utils/submitForm'
+import useAxiosProtected from '../hooks/useAxiosProtected';
+
+import {
+  Box,
+  FormGroup,
+  FormControl,
+  FormLabel,
+  TextField,
+  Button
+} from '@mui/material'
+
 export default function TransferForm() {
+  let axiosInstance = useAxiosProtected();
   let [formData, setFormData] = useState({
     to: '',
     amount: ''
@@ -9,26 +24,51 @@ export default function TransferForm() {
     setFormData((prevState) => ({...prevState, [name]: value}))
   }
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (e) => {
     try {
-      let res = await useFormSubmit(event, submitTo);
-      console.log(res);
+      let res = await submitForm(e, "/api/v1/user/transactions", axiosInstance);
     } catch (err) {
       console.log(err);
     }
   }
 
   return (
-    <div className="TransferForm">
-    <form onSubmit={handleSubmit}>
-        <label htmlFor="email">Email:</label>
-        <input type="email" id="to" name="to" value={formData.to} onChange={handleChange} required />
+    <Box sx={{ width: '100%', maxWidth: 360, borderRadius: 3, border: 1, padding: 1 }}>
+      <h3>Transfer Form</h3>
+      <form onSubmit={handleSubmit}>
+        <FormGroup>
+          <FormControl>
+            <FormLabel htmlFor="email">
+              Send To:
+            </FormLabel>
+            <TextField 
+              type="email"
+              id="email" 
+              name="email"
+              value={formData.to} 
+              onChange={handleChange} 
+              fullWidth
+              required
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="amount">
+              Amount
+            </FormLabel>
+            <TextField 
+              id="amount" 
+              name="amount"
+              type="number"
+              value={formData.amount} 
+              onChange={handleChange} 
+              fullWidth
+              required
+            />
+          </FormControl>
+      </FormGroup>
 
-        <label htmlFor="password">Password:</label>
-        <input type="" id="password" name="password" value={formData.password} onChange={handleChange} required />
-
-        <button type="submit">Send</button>
+      <Button type="submit" fullWidth variant="contained" color="secondary">Send</Button>
     </form>
-  </div>
+  </Box>
   )
 }

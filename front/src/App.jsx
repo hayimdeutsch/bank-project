@@ -8,7 +8,7 @@ import Signup from './pages/Signup';
 import AdminLogin from './pages/AdminLogin';
 import AdminPanel from './pages/AdminPanel';
 import PageNotFound from './pages/PageNotFound';
-import UserContextProvider from './context/UserContextProvider';
+import UserContextProvider from './context/UserContext';
 
 function App() {
   return (
@@ -22,7 +22,7 @@ function App() {
             <Route exact path='/dashboard' Component={Dashboard} />
             <Route exact path='/signup' Component={Signup} />
             <Route exact path='/admin/login' Component={AdminLogin} />
-            <Route exact path='admin/panel' Component={AdminPanel} />
+            <Route exact path='/admin/panel' Component={AdminPanel} />
             <Route path='*' Component={PageNotFound} />
           </Routes>
           <Footer />

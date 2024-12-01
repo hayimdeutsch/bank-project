@@ -1,12 +1,9 @@
-import axios from 'axios'
-
-const sendForm = async (e, endpoint) => {
+export default async function submitForm(e, endpoint, axiosInstance) {
   e.preventDefault();
   let data = Object.fromEntries(new FormData(e.target).entries());
-  let response = await axios.post(endpoint, data, { headers: 
+  let response = await axiosInstance.post(endpoint, data, { headers: 
     {'Content-Type': 'application/json' }
   });
   return response;
 }
 
-export default sendForm;

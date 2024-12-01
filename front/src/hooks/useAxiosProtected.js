@@ -1,9 +1,13 @@
-import "../utils/axios"
-import axios from "axios";
 import { useEffect } from "react";
-import { privateAxios } from "../utils/axios";
+import { useNavigate } from "react-router-dom";
+import axios from "../utils/api";
+import { privateAxios } from "../utils/api";
+import { useAuthContext } from '../context/UserContext'
 
-const useProtectedFetch = () => {
+export default () => {
+  let { activeUser, setActiveUser, logout } = useAuthContext();
+  let navigate = useNavigate();
+
   useEffect(() => {    
     const requestIntercept = privateAxios.interceptors.request.use(
       (config) => {
@@ -22,21 +26,30 @@ const useProtectedFetch = () => {
         let reqConfig = error?.config;
     
         if (error.response.status === 401 && !reqConfig.isRetry) {
-          console.log("need to refresh, trying now");
-          const refreshToken = localStorage.getItem('refreshToken');
-          console.log(sessionStorage.getItem('accessToken'));
-          console.log(refreshToken);
+          let refreshToken = localStorage.getItem('refreshToken');
+          // let refreshToken = activeUser?.refreshToken;
           reqConfig.isRetry = true;
-          const refreshResopnse = await axios.post(
-            "/api/v1/refresh", 
-            {refreshToken},
-          );
-          console.log("refreshed", refreshResopnse)
-          sessionStorage.setItem('accessToken', refreshResopnse.data.accessToken);
-          localStorage.setItem('refreshToken', refreshResopnse.data.refreshToken);
-          console.log(sessionStorage.getItem('accessToken'));
-          console.log(localStorage.getItem('refreshToken'));
-          return privateAxios(reqConfig);
+          try {
+            const refreshResopnse = await axios.post(
+              "/api/v1/refresh", 
+              {refreshToken},
+            );
+            const accessToken = refreshResopnse?.data?.accessToken;
+            refreshToken = refreshResopnse?.data?.refreshToken;
+            setActiveUser((prev) => ({
+              ...prev, 
+              accessToken,
+              refreshToken
+            }))
+            sessionStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
+            return privateAxios(reqConfig);
+          } catch (err) {
+            logout();
+            navigate("/");
+            return Promise.reject(error);
+ 
+          }
         }
         return Promise.reject(error);
       }
@@ -51,5 +64,3 @@ const useProtectedFetch = () => {
   
   return privateAxios;
 }
-
-export default useProtectedFetch;
