@@ -20,10 +20,10 @@ const corsOptions = {
 }
 
 const codeExpiryMins = 5;
-
 const expirationTime = codeExpiryMins * 60 * 1000;
-
 const cleanUpInterval = 60 * 60 * 1000;
+const accessTokenExpiration = '15m';
+const refreshTokenExpiration = '3h';
 
 export { 
     connectDB, 
@@ -31,5 +31,7 @@ export {
     codeExpiryMins, 
     expirationTime, 
     cleanUpInterval,
+    accessTokenExpiration,
+    refreshTokenExpiration,
     corsOptions
 };
