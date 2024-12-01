@@ -5,6 +5,7 @@ import sendForm from "../utils/submitForm";
 import { useAuthContext } from "../context/UserContext";
 
 import {
+  Dialog,
   FormGroup,
   FormControl,
   FormLabel,
@@ -13,7 +14,7 @@ import {
 } from "@mui/material";
 
 
-export default function LoginForm({submitTo, next}) {
+export default function LoginForm({open, handleClose, submitTo, next}) {
   let [formData, setFormData] = useState( {
     email: '',
     password: ''
@@ -39,6 +40,7 @@ export default function LoginForm({submitTo, next}) {
           accessToken: response?.data?.accessToken,
           refreshToken: response?.data?.refreshToken
         });
+        handleClose();
         navigate(next);
       } catch (error) {
         if (error?.response && error?.response?.status === 400) {
@@ -55,7 +57,11 @@ export default function LoginForm({submitTo, next}) {
   }
 
   return (
-    <div className="LoginForm">
+    <Dialog 
+      className="LoginForm"
+      open={open}
+      onClose={handleClose}
+      sx={{ "& .MuiPaper-root": { backgroundColor: "background.paper" } }}>
       <form onSubmit={handleSubmit}>
         <FormGroup>
           <FormControl>
@@ -88,11 +94,11 @@ export default function LoginForm({submitTo, next}) {
           </FormControl>
         </FormGroup>
 
-        <Button type="submit" fullWidth variant="contained" color="secondary">Login</Button>
+        <Button type="submit" fullWidth variant="contained" sx={{mt: 2}} >Login</Button>
       </form>
       {error && <div className="errorMsg">{error}</div>}
 
-    </div>
+    </Dialog>
   )
 }
 

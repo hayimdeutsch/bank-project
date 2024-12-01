@@ -5,6 +5,7 @@ import useAxiosProtected from '../hooks/useAxiosProtected';
 
 import {
   Box,
+  Modal,
   FormGroup,
   FormControl,
   FormLabel,
@@ -12,17 +13,19 @@ import {
   Button
 } from '@mui/material'
 
-export default function TransferForm() {
+export default function TransferForm({open, handleClose}) {
   let axiosInstance = useAxiosProtected();
-  let [formData, setFormData] = useState({
-    to: '',
-    amount: ''
-  });
+  let [to, setTo] = useState('');
+  let [amount, setAmount] = useState(0);
+  // let [formData, setFormData] = useState({
+  //   to: '',
+  //   amount: ''
+  // });
 
-  const handleChange = (event) => {
-    let {name, value} = event.target;
-    setFormData((prevState) => ({...prevState, [name]: value}))
-  }
+  // const handleChange = (event) => {
+  //   let {name, value} = event.target;
+  //   setFormData((prevState) => ({...prevState, [name]: value}))
+  // }
 
   const handleSubmit = async (e) => {
     try {
@@ -33,42 +36,46 @@ export default function TransferForm() {
   }
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 360, borderRadius: 3, border: 1, padding: 1 }}>
-      <h3>Transfer Form</h3>
-      <form onSubmit={handleSubmit}>
-        <FormGroup>
-          <FormControl>
-            <FormLabel htmlFor="email">
-              Send To:
-            </FormLabel>
-            <TextField 
-              type="email"
-              id="email" 
-              name="email"
-              value={formData.to} 
-              onChange={handleChange} 
-              fullWidth
-              required
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel htmlFor="amount">
-              Amount
-            </FormLabel>
-            <TextField 
-              id="amount" 
-              name="amount"
-              type="number"
-              value={formData.amount} 
-              onChange={handleChange} 
-              fullWidth
-              required
-            />
-          </FormControl>
-      </FormGroup>
+    <div>
+      <Modal open={open} onClose={handleClose} >
+        <Box sx={{ width: '100%', maxWidth: 360, borderRadius: 3, border: 1, padding: 1 }}>
+          <h3>Transfer Form</h3>
+          <form onSubmit={handleSubmit}>
+            <FormGroup>
+              <FormControl>
+                <FormLabel htmlFor="to">
+                  Send To:
+                </FormLabel>
+                <TextField 
+                  type="email"
+                  id="to" 
+                  name="to"
+                  value={to} 
+                  onChange={(e)=>setTo(e.target.value)} 
+                  fullWidth
+                  required
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel htmlFor="amount">
+                  Amount
+                </FormLabel>
+                <TextField 
+                  id="amount" 
+                  name="amount"
+                  type="number"
+                  value={amount} 
+                  onChange={(e)=>setAmount(e.target.value)} 
+                  fullWidth
+                  required
+                />
+              </FormControl>
+            </FormGroup>
 
-      <Button type="submit" fullWidth variant="contained" color="secondary">Send</Button>
-    </form>
-  </Box>
+            <Button type="submit" fullWidth variant="contained" color="secondary">Send</Button>
+          </form>
+        </Box>
+      </Modal>
+    </div>
   )
 }
