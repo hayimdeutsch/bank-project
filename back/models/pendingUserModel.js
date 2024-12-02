@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { expirationTime } from "../config.js";
 
-const pendingUserSchema =  new mongoose.Schema(
+const PendingUserSchema =  new mongoose.Schema(
     {
         _id: {
             type: String,
@@ -11,6 +11,7 @@ const pendingUserSchema =  new mongoose.Schema(
             type: String,
             match: /^[0-9]{6}$/,
             index: true,
+            required: true,
         },
         firstName: {
             type: String,
@@ -35,6 +36,6 @@ const pendingUserSchema =  new mongoose.Schema(
     }
 );
 
-const PendingUser = mongoose.model('PendingUser', pendingUserSchema);
+const PendingUser = mongoose.model('PendingUser', PendingUserSchema);
 
 export default PendingUser;

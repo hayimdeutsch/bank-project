@@ -4,7 +4,14 @@ import { Decimal128, ObjectId } from "mongoose";
 const UserSchema = new mongoose.Schema({
     _id: {
         type: String,
-        match: /^\S+@\S+\.\S+$/
+        match: /^\S+@\S+\.\S+$/,
+        validate: {
+            validator: async function (value) {
+              const existingUser = await mongoose.model("User").findById(value);
+              return !existingUser;
+            },
+            message: "Email already exists",
+          },
     },
     firstName: {
         type: String,

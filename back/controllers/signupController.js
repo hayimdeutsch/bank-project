@@ -1,111 +1,79 @@
 import bcrypt from 'bcrypt';
-import User from '../models/userModel.js';
-import PendingUser from '../models/pendingUserModel.js';
-import { sendConfirmationCode } from '../utils/sendEmail.js';
+import BankError from '../utils/bankError.js';
 import { expirationTime } from '../config.js';
+import { sendConfirmationCode } from '../utils/sendEmail.js';
+import { 
+    getPendingUserByCode, 
+    checkIfEmailTaken, 
+    addPendingUser, 
+    deletePendingUserByCode,
+    addUser,
+    getPendingUserByEmail,
+    updatePendingUserByEmail
+} from '../utils/db.js';
 
-export const signUp = async (req, res) => {
-    let { email } = req.body;
-    let existingUser = await User.findById(email);
-    let existingPendingUser = await PendingUser.findById(email);
-
-    if (existingUser || existingPendingUser) {
-        return res.status(409).json({msg: "Email taken"});
-    }
-
+export const signUp = async (req, res, next) => {
     try {
-        let newPendingUser = await initNewUser(req, res);
+        let newUser = {...req.body};
+        const isTaken = await checkIfEmailTaken(newUser.email);
+        if (isTaken) {
+            throw new BankError("Email already taken", 409);
+        }
+        
+        newUser.password = await hashPassword(newUser?.password);
+        newUser.expiration = calculateExpirationTime();
+        newUser.confirmationCode = generateConfirmationCode();
 
-        sendConfirmationCode(email, newPendingUser.confirmationCode);
+        await addPendingUser(newUser)
+        sendConfirmationCode(newUser.email, newUser.confirmationCode);
         res.status(202).json({
+            success: true,
             msg: "User Added Successfully", 
-            confirmationCode: newPendingUser.confirmationCode 
+            // confirmationCode: newUser.confirmationCode 
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const confirmActivation = async (req, res, next) => {
+    try {
+        let pendingUser = await getPendingUserByCode(req.body.confirmationCode);
+        await checkIfCodeExpired(pendingUser);
+        let {_id : email, firstName, lastName, phone, password } = pendingUser;
+        await addUser({email, firstName, lastName, phone, password});
+        await deletePendingUserByCode(pendingUser.confirmationCode);
+        res.status(202).json({msg: "Account cofirmed", success: true})
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const resendActivation = async (req, res, next) => {
+    try {
+        const email = req.body.email;
+        let pendingUser = await getPendingUserByEmail(email);
+        await checkIfCodeExpired(pendingUser);
+        const extendedExpTime = calculateExpirationTime();
+        const otp = generateConfirmationCode();
+        const update = { expiration: extendedExpTime, confirmationCode: otp };
+        await updatePendingUserByEmail(email, update)
+        sendConfirmationCode(email, otp);
+        res.status(200).json({
+            success: true,
+            msg: "Confirmation code resent"
+            //     confirmationCode: otp
         });
     } catch (err) {
-        console.log(err);
-        return res.status(500).json({msg: "Internal server error"})
+        next(err)
     }
 }
 
-export const confirmActivation = async (req, res) => {
-    let code = req.body.confirmationCode;
-    let pendingUser = await PendingUser.findOne({confirmationCode: code});
-    if (!pendingUser) {
-        return res.status(400).json({msg: "Wrong activation code"});
-    }
-    
+async function checkIfCodeExpired(pendingUser) {
     if (pendingUser.expiration < Date.now()) {
-        await PendingUser.deleteOne({confirmationCode: code});
-        return res.status(400).json({msg: "Activation code expired"})
+        await deletePendingUserByCode(pendingUser.confirmationCode);
+        throw new BankError("Confirmation code expired", 400);
     }
-
-    let newUser = new User({
-        _id: pendingUser._id, 
-        firstName: pendingUser.firstName,
-        lastName: pendingUser.lastName,
-        phone: pendingUser.phone,
-        password: pendingUser.password   
-    });
-    console.log(newUser);
-
-    try {
-        await PendingUser.deleteOne({confirmationCode: code});
-        await newUser.save();
-        res.status(200).json({msg: "Account Confirmed"});
-    } catch (err) {
-        res.status(500).json({msg: err.msg})
-    }
-}
-
-export const resendActivation = async (req, res) => {
-    const email = req.body.email;
-    let pendingUser = await PendingUser.findById(email);
-    if (!pendingUser) {
-        return res.status(400).json({msg: "Wrong activation code"});
-    }
-
-    if (pendingUser.expiration < Date.now()) {
-        await PendingUser.deleteOne({confirmationCode: code});
-        return res.status(400).json({msg: "Activation code expired"})
-    }
-
-    const extendedExpTime = calculateExpirationTime();
-    const otp = generateConfirmationCode();
-    sendConfirmationCode(email, otp);
-    console.log(email, extendedExpTime, otp)
-    try {
-        await PendingUser.findByIdAndUpdate( email, 
-            {
-                $set: {
-                    confirmationCode: otp,
-                    expiration: extendedExpTime
-                }
-            }
-        );
-        res.status(200).json({msg: "Confirmation code resent", confirmationCode: otp})
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({msg: err.msg})
-    }
-}
-
-async function initNewUser(req) {
-    let {firstName, lastName, email, phone, password } = req.body;
-    let hashedPassword = await hashPassword(password);
-    let otp = generateConfirmationCode();
-    let exp = calculateExpirationTime();
-    console.log(exp);
-    let newPendingUser = new PendingUser({
-        _id: email, 
-        confirmationCode: otp, 
-        firstName, 
-        lastName, 
-        phone,
-        expiration: exp,
-        password: hashedPassword
-    });
-    await newPendingUser.save();
-    return newPendingUser;
 }
 
 async function hashPassword(password) {

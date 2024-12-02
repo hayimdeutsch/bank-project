@@ -1,32 +1,33 @@
 import bcrypt from 'bcrypt';
-import User from '../models/userModel.js';
 import generateTokens from '../utils/generateTokens.js';
+import BankError from '../utils/bankError.js';
+import { getUserByEmail } from '../utils/db.js';
 
-export const logIn = async (req, res) => {
-    let {email, password} = req.body;
-    let user = null;
-
+export const logIn = async (req, res, next) => {   
     try {
-        user = await User.findById(email);
+        let {email, password} = req.body;
+        const user = await getUserByEmail(email);
+
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            throw new BankError("Incorrect password", 400);
+        }
+
+        let tokens = generateTokens(res, email);
+
+        return res.status(200).json(
+            {
+                msg: "Successful login",
+                 ...tokens,
+                  success: true
+            }
+        );
     } catch (err) {
-        console.log(err);
-        return res.status(500).json({msg: "Internal server error"})
+        next(err);
     }
-    if (!user) {
-        return res.status(400).json({msg: "Incorrect Username"});
-    }
-    
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-        return res.status(400).json({msg: "Incorrect password"});
-    }
-
-    let tokens = generateTokens(res, email);
-
-    return res.status(200).json({msg: "Successful login", ...tokens});
 }
 
-export const logOut = async (req, res) => {
+export const logOut = async (req, res, next) => {
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
     res.status(200).json({msg: "Successfully logged out"});

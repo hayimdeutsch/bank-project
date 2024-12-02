@@ -1,98 +1,76 @@
-import User from '../models/userModel.js';
-import mongoose from 'mongoose';
-import Transaction from '../models/transactionModel.js';
+import BankError from '../utils/bankError.js';
+import { 
+    getUserByEmail, 
+    getUserTransactionsByEmail, 
+    postTransaction 
+} from '../utils/db.js';
 
-export const getInfo = async (req, res) => {
+export const getInfo = async (req, res, next) => {
     try {
-        const user = await User.findById(req.body.email);
+        const user = await getUserByEmail(req.body.email);
         let userInfo = {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user._id,
             phone: user.phone
         };
-        return res.status(200).json({userInfo});
+        res.status(200).json({
+            success: true, 
+            userInfo
+        });
     } catch (err) {
-        console.log(err);
-        return res.status (500).json({msg: "Internal server error"});
+        next(err);
     }
 }
 
-export const getBalance = async (req, res) => {
+export const getBalance = async (req, res, next) => {
     try {
-        let userData = await User.findById(req.body.email);
-        res.status(200).json({balance: userData.balance});
+        const user = await getUserByEmail(req.body.email);
+        res.status(200).json({
+            success: true, 
+            balance: user.balance
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+export const getTransactions = async (req, res, next) => {
+    try {
+        let userTransactions = await getUserTransactionsByEmail(req.body.email)
+        res.status(200).json({
+            success: true, 
+            transactions: userTransactions.transactions
+        });
     } catch(err) {
-        console.log(err);
-        return res.status(500).json({message: err.message})
+        next(err);
     }
 }
 
-export const getTransactions = async (req, res) => {
+export const postTransactions = async (req, res, next) => {
     try {
-        let userTransactions = 
-        await User.findById(req.body.email, "transactions -_id")
-        .populate({
-            path: 'transactions',
-            select: 'from to amount time -_id',
-            options: { getters: true },
-    })
-        .exec();
-        res.status(200).json({transactions: userTransactions.transactions});
-    } catch(err) {
-        return res.status(500).json({message: err.message})
-    }
-}
+        let { email:from, to, amount } = req.body;
 
-export const postTransactions = async (req, res) => {
-    let { email, to, amount } = req.body;
+        if (from === to) {
+            throw new BankError("Can't send money to yourself", 400);
+        }
 
-    if (email == to) {
-        return res.status(400).json({ msg: "You can't send money to yourself" });
-    }
+        const fromUser = await getUserByEmail(from);
+        const toUser = await getUserByEmail(to);
 
-    let from = null;
-    
-    try {
-        from = await User.findById(email);
-        to = await User.findById(to);
+        if (!toUser) {
+            throw new BankError("Recipient not found", 400);
+        }
+
+        if (fromUser.balance < amount) {
+            throw new BankError("Insufficient funds", 400);
+        }
+        await postTransaction(from, to, amount);
+        res.status(200).json({
+            success: true,
+            msg: "Successful transaction"
+        });
     } catch (err) {
-        return res.status(500).json({msg: "Internal Server Error"});
-    }
-    if (!to) {
-        return res.status(400).json({msg: "Recipient not found"});
-    }
-    if (from.balance < amount) {
-        return res.status(400).json({msg: "Insufficient funds"});
-    }
-    let transaction = new Transaction({
-        from: from._id, 
-        to: to._id, 
-        amount
-    });
-
-    let session = await mongoose.connection.startSession();
-    try {
-        session.startTransaction();
-        await transaction.save({session});
-        await User.findByIdAndUpdate(from._id, 
-            {
-                $inc : {balance : -amount}, 
-                $push: {transactions: transaction._id}
-            },{session});
-        await User.findByIdAndUpdate(to._id, 
-            {
-                $inc : {balance : amount}, 
-                $push: {transactions: transaction._id}
-            }, {session});
-
-        await session.commitTransaction()
-        res.status(200).json({msg: "Successful transaction"});
-    } catch (err) {
-        console.log(err)
-        await session.abortTransaction();
-        res.status(500).json({msg: "Internal Server Error"})
-    } finally {
-        session.endSession()
+        next(err);
     }
 }
