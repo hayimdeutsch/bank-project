@@ -38,7 +38,9 @@ export default function TransferForm({open, handleClose}) {
   return (
     <div>
       <Modal open={open} onClose={handleClose} >
-        <Box sx={{ width: '100%', maxWidth: 360, borderRadius: 3, border: 1, padding: 1 }}>
+        <Box sx={{ "& .MuiPaper-root": { backgroundColor: "background.paper" } }}>
+
+        {/* <Box sx={{ width: '100%', maxWidth: 360, borderRadius: 3, border: 1, padding: 1 }}> */}
           <h3>Transfer Form</h3>
           <form onSubmit={handleSubmit}>
             <FormGroup>

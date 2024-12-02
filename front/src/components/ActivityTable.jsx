@@ -28,7 +28,7 @@ export default function ActivityTable() {
         // error ? 
         // <div>{error.msg } </div> :
         <TableContainer >
-          <Table sx={{ minWidth: 650, border: 1, borderRadius: 3 }} aria-label="simple table">
+          <Table sx={{ padding: 2, minWidth: 650, border: 1, borderRadius: 3 }} aria-label="simple table">
             <TableHead>
               <TableRow>
                 <TableCell></TableCell>

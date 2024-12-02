@@ -165,6 +165,7 @@
 
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import sendForm from "../utils/submitForm";
 import axios from "../utils/api";
 
@@ -179,7 +180,6 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -190,7 +190,6 @@ export default function Signup() {
     password: "",
   });
   const [isValidSignUp, setIsValidSignUp] = useState(false);
-
   const handleClose = () => setIsValidSignUp(true);
 
   const handleChange = (event) => {

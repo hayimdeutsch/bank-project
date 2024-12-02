@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 import Grid from '@mui/material/Grid2'
 
 const Footer = () => {
@@ -8,10 +8,11 @@ const Footer = () => {
       sx={{
         backgroundColor: "background.paper",
         paddingTop: 2, 
+        px: 10,
         mt: 4,
       }}
     >
-      <Grid container spacing={8} paddingLeft={8} paddingRight={8}>
+      <Grid container sx={{px: 10}} spacing={8} >
         <Grid size={{ xs: 4, sm: 8, md: 8 }}>
           <Typography variant="h6" gutterBottom>
             About MoBank
@@ -23,25 +24,25 @@ const Footer = () => {
           </Typography>
         </Grid>
 
-        <Grid size={{ xs: 2, sm: 4, md: 4 }}>
+        <Grid size={{ xs: 4, sm: 4, md: 4 }}>
           <Typography variant="h6" gutterBottom>
             Get in Touch
           </Typography>
-          <Typography variant="body2">
+          <Typography variant="body2" sx={{ lineHeight: 1.8 }}>
             Email: support@mobank.com
           </Typography>
-          <Typography variant="body2">
+          <Typography variant="body2" sx={{ lineHeight: 1.8 }}>
             Phone: 03 - INFINITY
           </Typography>
-          <Typography variant="body2">
+          <Typography variant="body2" sx={{ lineHeight: 1.8 }}>
             Address: Jabotinsky St 1, Ramat Gan, IL
           </Typography>
         </Grid>
       </Grid>
-
+<Divider sx={{my:1}}/>
       <Box
         sx={{
-          pt: 2,
+          pb:1,
           textAlign: "center",
         }}
       >

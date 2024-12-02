@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/UserContext'
-import { AppBar, Button, Toolbar, Typography } from '@mui/material';
+import { AppBar, Button, Toolbar, Typography, Box } from '@mui/material';
 import LoginForm from '../components/LoginForm'
 
 export default function Header() {
@@ -12,7 +12,7 @@ export default function Header() {
   let navigate = useNavigate();  
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  const hadleOpen = () => setIsLoggingIn(true)
+  const handleOpen = () => setIsLoggingIn(true)
   const handleClose = () => setIsLoggingIn(false);
 
   const handleClick = () => {
@@ -37,11 +37,17 @@ export default function Header() {
   }, [pathname])
 
   return (
-    <AppBar position="sticky" className="Header">      
+    <AppBar sx={{px:10}} position="sticky" className="Header">      
         {
           loggedIn ?
           <Toolbar>
-            <Button color={"inherit"} onClick={ handleClick }>Logout</Button>
+            <Box sx={{  flexDirection: 'row-reverse' }}>
+              <Button color={"inherit"} onClick={ handleClick }>
+                <Typography variant='h6'>
+                   Logout
+                </Typography>  
+              </Button>
+            </Box>
           </Toolbar> 
               :
           <Toolbar>
@@ -49,7 +55,9 @@ export default function Header() {
               <NavLink to={next}>MO Bank</NavLink>
             </Typography>
             <Typography component={"div"} sx={{flexGrow: 1}} />
-            <Button  color={"inherit"} onClick={hadleOpen}> Log In</Button>
+            <Button color={"inherit"} size='small' onClick={handleOpen}> 
+              <Typography variant='h6' >Login</Typography>
+            </Button>
             <LoginForm open={isLoggingIn} handleClose={handleClose} submitTo={"api/v1/login"} next={"/dashboard"} />
           </Toolbar>
         }
