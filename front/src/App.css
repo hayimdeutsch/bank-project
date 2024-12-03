@@ -1,16 +1,9 @@
 .logo {
   background: linear-gradient(90deg, #5b71ec 0%, #a6c5f6 100%);
-  /* background: linear-gradient(to right, #cfbcc3, #45839b);  */
   -webkit-text-fill-color: transparent;
   background-clip: text;
   -webkit-background-clip: text;
   font-weight:bolder;
-}
-
-body, html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
 }
 
 #root {
@@ -24,9 +17,13 @@ body, html {
   padding: 2% 10%;
 }
 
-.foot {
+.Header {
+  padding: 1px 10%;
+}
+
+.footer {
   background-color: #333;
   color: white;
+  align-items: center;
   text-align: center;
-  padding: 1rem;
 }

@@ -15,9 +15,9 @@
 
 // export default function Signup() {
 //   let [formData, setFormData] = useState({
-//     firstName: '', 
+//     firstName: '',
 //     lastName: '',
-//     email: '', 
+//     email: '',
 //     phone: '',
 //     password: ''
 //   });
@@ -127,7 +127,7 @@
 //       handleClose();
 //       navigate("/")
 //     } catch (error) {
-      
+
 //     }
 //   }
 
@@ -162,7 +162,6 @@
 //       </Dialog>
 //   )
 // }
-
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -262,8 +261,7 @@ export default function Signup() {
               variant="contained"
               fullWidth
               sx={{
-                background:
-                  "linear-gradient(90deg, #536dfe 0%, #82b1ff 100%)",
+                background: "linear-gradient(90deg, #536dfe 0%, #82b1ff 100%)",
                 color: "white",
               }}
             >
@@ -307,7 +305,9 @@ function ActivationForm({ open, handleClose }) {
         <form onSubmit={handleSubmit}>
           <FormGroup sx={{ gap: 2 }}>
             <FormControl>
-              <FormLabel htmlFor="confirmationCode">Confirmation Code</FormLabel>
+              <FormLabel htmlFor="confirmationCode">
+                Confirmation Code
+              </FormLabel>
               <TextField
                 id="confirmationCode"
                 name="confirmationCode"
@@ -322,8 +322,7 @@ function ActivationForm({ open, handleClose }) {
               variant="contained"
               fullWidth
               sx={{
-                background:
-                  "linear-gradient(90deg, #536dfe 0%, #82b1ff 100%)",
+                background: "linear-gradient(90deg, #536dfe 0%, #82b1ff 100%)",
                 color: "white",
               }}
             >

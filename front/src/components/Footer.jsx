@@ -1,26 +1,29 @@
 import { Box, Divider, Typography } from "@mui/material";
-import Grid from '@mui/material/Grid2'
+import Grid from "@mui/material/Grid2";
 
 const Footer = () => {
   return (
     <Box
+      className="foot"
       component="footer"
       sx={{
         backgroundColor: "background.paper",
-        paddingTop: 2, 
+        paddingTop: 2,
         px: 10,
         mt: 4,
       }}
     >
-      <Grid container sx={{px: 10}} spacing={8} >
+      <Grid container sx={{ px: 10 }} spacing={8}>
         <Grid size={{ xs: 4, sm: 8, md: 8 }}>
           <Typography variant="h6" gutterBottom>
             About MoBank
           </Typography>
           <Typography variant="body2">
-          At MoBank, we believe banking should be simple, secure, and tailored to your unique needs. 
-  Our mission is to empower individuals and businesses by providing cutting-edge financial solutions 
-  designed for modern life. Whatever your needs, MoBank is here to help every step of the way.
+            At MoBank, we believe banking should be simple, secure, and tailored
+            to your unique needs. Our mission is to empower individuals and
+            businesses by providing cutting-edge financial solutions designed
+            for modern life. Whatever your needs, MoBank is here to help every
+            step of the way.
           </Typography>
         </Grid>
 
@@ -39,10 +42,10 @@ const Footer = () => {
           </Typography>
         </Grid>
       </Grid>
-<Divider sx={{my:1}}/>
+      <Divider sx={{ my: 1 }} />
       <Box
         sx={{
-          pb:1,
+          pb: 1,
           textAlign: "center",
         }}
       >
@@ -55,4 +58,3 @@ const Footer = () => {
 };
 
 export default Footer;
-

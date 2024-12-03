@@ -15,23 +15,22 @@ import {
   Button,
   Typography,
   IconButton,
-  InputAdornment
+  InputAdornment,
 } from "@mui/material";
 
-
-export default function LoginForm({open, handleClose, submitTo, next}) {
-  let [ email, setEmail ] = useState('');
-  let [ password, setPassword ] = useState('');
-  let [error, setError] = useState('');
+export default function LoginForm({ open, handleClose, submitTo, next }) {
+  let [email, setEmail] = useState("");
+  let [password, setPassword] = useState("");
+  let [error, setError] = useState("");
   let [showPassword, setShowPassword] = useState(false);
   let navigate = useNavigate();
   let { login } = useAuthContext();
 
   const handleChange = (event) => {
     setError(null);
-    let {name, value} = event.target;
-    setFormData((prevState) => ({...prevState, [name]: value}))
-  }
+    let { name, value } = event.target;
+    setFormData((prevState) => ({ ...prevState, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     if (!email || !password) {
@@ -42,59 +41,66 @@ export default function LoginForm({open, handleClose, submitTo, next}) {
         login({
           user: email,
           accessToken: response?.data?.accessToken,
-          refreshToken: response?.data?.refreshToken
+          refreshToken: response?.data?.refreshToken,
         });
         handleClose();
         navigate(next);
       } catch (error) {
-        if (error?.response && 
-          (error.response?.status === 400 || error.response.status === 422)) {
-            setError("Email or Password are Inccorect");
+        if (
+          error?.response &&
+          (error.response?.status === 400 || error.response.status === 422)
+        ) {
+          setError("Email or Password are Inccorect");
         } else {
-          setEmail('');
-          setPassword('');
+          setEmail("");
+          setPassword("");
           alert("Login failed");
           navigate("/");
         }
       }
     }
-  }
+  };
 
   return (
-    <Dialog 
+    <Dialog
       className="LoginForm"
       open={open}
       onClose={handleClose}
-      sx={{ "& .MuiPaper-root": { backgroundColor: "background.paper" } }}>
+      sx={{ "& .MuiPaper-root": { backgroundColor: "background.paper" } }}
+    >
       <Box sx={{ padding: 4, maxWidth: 500, margin: "auto" }}>
-        <Typography variant="h4" component="h2" gutterBottom >
+        <Typography variant="h4" component="h2" gutterBottom>
           Welcome Back
         </Typography>
         <form onSubmit={handleSubmit}>
-          <FormGroup sx={{gap: 2}}>
+          <FormGroup sx={{ gap: 2 }}>
             <FormControl>
-              <FormLabel htmlFor="email">
-                Email
-              </FormLabel>
-              <TextField 
+              <FormLabel htmlFor="email">Email</FormLabel>
+              <TextField
                 id="email"
                 name="email"
                 type="email"
-                value={email} 
-                onChange={(e) => { setError(null); setEmail(e.target.value)}}
+                value={email}
+                onChange={(e) => {
+                  setError(null);
+                  setEmail(e.target.value);
+                }}
                 size="small"
                 fullWidth
                 required
               />
             </FormControl>
-          <FormControl >
+            <FormControl>
               <FormLabel htmlFor="password">Password</FormLabel>
               <TextField
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => { setError(null); setPassword(e.target.value)}}
+                onChange={(e) => {
+                  setError(null);
+                  setPassword(e.target.value);
+                }}
                 fullWidth
                 required
                 size="small"
@@ -113,7 +119,6 @@ export default function LoginForm({open, handleClose, submitTo, next}) {
                   },
                 }}
               />
-
             </FormControl>
           </FormGroup>
 
@@ -124,22 +129,19 @@ export default function LoginForm({open, handleClose, submitTo, next}) {
           )}
 
           <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              sx={{
-                mt: 3,
-                background:
-                  "linear-gradient(90deg, #536dfe 0%, #82b1ff 100%)",
-                color: "white",
-              }}
-            >
-              Login
-            </Button>
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{
+              mt: 3,
+              background: "linear-gradient(90deg, #536dfe 0%, #82b1ff 100%)",
+              color: "white",
+            }}
+          >
+            Login
+          </Button>
         </form>
       </Box>
     </Dialog>
-  )
+  );
 }
-
-

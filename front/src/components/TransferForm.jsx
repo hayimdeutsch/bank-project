@@ -1,83 +1,73 @@
-import { useState } from 'react';
+import { useState } from "react";
+import submitForm from "../utils/submitForm";
+import useAxiosProtected from "../hooks/useAxiosProtected";
 
-import submitForm from '../utils/submitForm'
-import useAxiosProtected from '../hooks/useAxiosProtected';
+import { Box, TextField, Button } from "@mui/material";
 
-import {
-  Box,
-  Modal,
-  FormGroup,
-  FormControl,
-  FormLabel,
-  TextField,
-  Button
-} from '@mui/material'
-
-export default function TransferForm({open, handleClose}) {
+export default function TransferForm({ setRefresh }) {
   let axiosInstance = useAxiosProtected();
-  let [to, setTo] = useState('');
-  let [amount, setAmount] = useState(0);
-  // let [formData, setFormData] = useState({
-  //   to: '',
-  //   amount: ''
-  // });
-
-  // const handleChange = (event) => {
-  //   let {name, value} = event.target;
-  //   setFormData((prevState) => ({...prevState, [name]: value}))
-  // }
+  let [to, setTo] = useState("");
+  let [amount, setAmount] = useState(null);
 
   const handleSubmit = async (e) => {
     try {
       let res = await submitForm(e, "/api/v1/user/transactions", axiosInstance);
+      setRefresh((prev) => prev + 1);
     } catch (err) {
       console.log(err);
     }
-  }
+  };
 
   return (
     <div>
-      <Modal open={open} onClose={handleClose} >
-        <Box sx={{ "& .MuiPaper-root": { backgroundColor: "background.paper" } }}>
+      <Box
+        sx={{
+          height: "100%",
+          alignContent: "center",
+          maxWidth: 360,
+          borderRadius: 3,
+          border: 1,
+          padding: 1,
+          backgroundColor: "background.paper",
+        }}
+      >
+        <h3>Transfer Form</h3>
+        <form
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+          onSubmit={handleSubmit}
+        >
+          <TextField
+            label="Send To"
+            type="email"
+            id="to"
+            name="to"
+            size="small"
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+            fullWidth
+            required
+          />
+          <TextField
+            label="Amount"
+            id="amount"
+            name="amount"
+            type="number"
+            size="small"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            fullWidth
+            required
+          />
 
-        {/* <Box sx={{ width: '100%', maxWidth: 360, borderRadius: 3, border: 1, padding: 1 }}> */}
-          <h3>Transfer Form</h3>
-          <form onSubmit={handleSubmit}>
-            <FormGroup>
-              <FormControl>
-                <FormLabel htmlFor="to">
-                  Send To:
-                </FormLabel>
-                <TextField 
-                  type="email"
-                  id="to" 
-                  name="to"
-                  value={to} 
-                  onChange={(e)=>setTo(e.target.value)} 
-                  fullWidth
-                  required
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel htmlFor="amount">
-                  Amount
-                </FormLabel>
-                <TextField 
-                  id="amount" 
-                  name="amount"
-                  type="number"
-                  value={amount} 
-                  onChange={(e)=>setAmount(e.target.value)} 
-                  fullWidth
-                  required
-                />
-              </FormControl>
-            </FormGroup>
-
-            <Button type="submit" fullWidth variant="contained" color="secondary">Send</Button>
-          </form>
-        </Box>
-      </Modal>
+          <Button type="submit" fullWidth variant="contained" color="primary">
+            Send
+          </Button>
+        </form>
+      </Box>
     </div>
-  )
+  );
 }

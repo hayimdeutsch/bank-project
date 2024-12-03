@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { Button, Typography } from "@mui/material";
-import Grid from '@mui/material/Grid2'
+import Grid from "@mui/material/Grid2";
 
 export default function Home() {
   let navigate = useNavigate();
 
   const handleClick = () => {
-    navigate("/signup")
-  }
+    navigate("/signup");
+  };
   return (
     <Grid
       container
@@ -20,7 +20,6 @@ export default function Home() {
         color: "text.primary",
       }}
     >
-
       <Grid
         xs={12}
         md={6}
@@ -33,19 +32,24 @@ export default function Home() {
           padding: 4,
         }}
       >
-         <Typography variant="h4" component="h2" gutterBottom>
+        <Typography variant="h4" component="h2" gutterBottom>
           Banking That Works for You
         </Typography>
         <Typography variant="body1" sx={{ maxWidth: 600 }}>
-          Discover secure and innovative financial solutions designed to
-          empower your goals. Join MoBank today and take control of your
-          finances with ease.
+          Discover secure and innovative financial solutions designed to empower
+          your goals. Join MoBank today and take control of your finances with
+          ease.
         </Typography>
-                  <Button sx={{mt: 3}} onClick={handleClick} variant={"contained"} align="center">
-            Join Now!
-          </Button>
-       </Grid> 
-       <Grid    
+        <Button
+          sx={{ mt: 3 }}
+          onClick={handleClick}
+          variant={"contained"}
+          align="center"
+        >
+          Join Now!
+        </Button>
+      </Grid>
+      <Grid
         xs={12}
         md={6}
         sx={{
@@ -56,7 +60,7 @@ export default function Home() {
           textAlign: "center",
           padding: 4,
         }}
-      >      
+      >
         <img src="/OnlineBankingAnimation.png" alt="OnlineBankingCartoon" />
       </Grid>
     </Grid>

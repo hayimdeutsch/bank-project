@@ -1,0 +1,416 @@
+import { useEffect, useState } from "react";
+
+import Transaction from "./Transaction";
+import useProtectedFetch from "../hooks/useProtectedFetch";
+import { useAuthContext } from "../context/UserContext";
+import formatCurrency from "../utils/formatCurrency";
+import { DataGrid } from "@mui/x-data-grid";
+import {
+  Box,
+  Stack,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableBody,
+  TableCell,
+} from "@mui/material";
+
+export default function ActivityTable({ refresh }) {
+  const [transactions, setTransactions] = useState([]);
+  let { activeUser } = useAuthContext();
+  let { loading, data, error } = useProtectedFetch(
+    "api/v1/user/transactions",
+    refresh
+  );
+
+  useEffect(() => {
+    if (data) {
+      setTransactions(data.balance);
+    }
+  }, [data]);
+
+  const columns = [
+    {
+      field: "direction",
+      editable: false,
+      resizable: false,
+      flex: 0.05,
+    },
+    {
+      field: "type",
+      headerName: "Transaction Type",
+      headerAlign: "center",
+      editable: false,
+      resizable: false,
+      flex: 0.1,
+    },
+    {
+      field: "from/to",
+      headerName: "From/To",
+      headerAlign: "center",
+      editable: false,
+      resizable: false,
+      flex: 0.2,
+    },
+    {
+      field: "amount",
+      headerName: "Amount",
+      headerAlign: "center",
+      editable: false,
+      resizable: false,
+      flex: 0.15,
+      valueGetter: (amount) => formatCurrency(amount),
+    },
+    {
+      field: "date",
+      headerName: "Date",
+      headerAlign: "center",
+      resizable: false,
+      flex: 0.2,
+    },
+    {
+      field: "time",
+      headerName: "Time",
+      headerAlign: "center",
+      resizable: false,
+      flex: 0.1,
+    },
+  ];
+
+  let rows = transactions.map((transaction, index) => {
+    return formatTransaction(...transaction, index + 1, activeUser.user);
+  });
+
+  return (
+    <Box className="ActivityTable">
+      <h3>ActivityTable</h3>
+      <Balance />
+      {loading ? (
+        <div> Loading... </div>
+      ) : (
+        // error ?
+        // <div>{error.msg } </div> :
+        <TableContainer>
+          <Table
+            sx={{ padding: 2, minWidth: 650, border: 1, borderRadius: 3 }}
+            aria-label="simple table"
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell>Transaction Type</TableCell>
+                <TableCell>From</TableCell>
+                <TableCell>To</TableCell>
+                <TableCell>Amount</TableCell>
+                <TableCell>Date</TableCell>
+                <TableCell>Time</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data &&
+                data.transactions.map((transaction, index) => {
+                  return (
+                    <Transaction
+                      {...transaction}
+                      key={index}
+                      user={activeUser.user}
+                    />
+                  );
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+      <Box
+        sx={{
+          width: "80%",
+          backgroundColor: "background.paper",
+          height: 400,
+          mb: 3,
+        }}
+      >
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 10,
+              },
+            },
+          }}
+          pageSizeOptions={[5, 10, 25]}
+        />
+      </Box>
+      ;
+    </Box>
+  );
+}
+
+function Balance() {
+  let { loading, error, data } = useProtectedFetch("api/v1/user/balance");
+  return (
+    <>
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <Stack direction="row" spacing={6} justifyContent={"flex-end"}>
+          <h4>Balance</h4>
+          {data && <h4>{formatCurrency(data.balance)}</h4>}
+          {/* { error && <p>{`Error - ${error?.msg}`}</p> } */}
+        </Stack>
+      )}
+    </>
+  );
+}
+
+function formatTransaction({ from, to, amount, time, user, index }) {
+  let type = from == to ? "Deposit" : "Transfer";
+  let isIncoming = to == user ? true : false;
+  let arrowColor = isIncoming ? "green" : "red";
+  let arrow = isIncoming ? "▲" : "▼";
+  let transactionTiming = new Date(time);
+  let other = type == "Deposit" ? "-" : isIncoming ? from : to;
+
+  return {
+    direction: arrow,
+    type,
+    "from/to": other,
+    amount,
+    date: transactionTiming.toDateString(),
+    time: transactionTiming.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+  };
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+import { TableRow, TableCell } from "@mui/material";
+
+export default function Transaction({ from, to, amount, time, user, index }) {
+  let type = from == to ? "Deposit" : "Transfer";
+  let isIncoming = to == user ? true : false;
+  let arrowColor = isIncoming ? "green" : "red";
+  let arrow = isIncoming ? "▲" : "▼";
+  let transactionTiming = new Date(time);
+  let other = type == "Deposit" ? "-" : isIncoming ? from : to;
+
+  return {
+    direction: arrow,
+    type,
+    "from/to": other,
+    amount,
+    date: transactionTiming.toDateString(),
+    time: transactionTiming.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+  };
+}
+
+// (
+// <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+// <TableCell style={{ color: arrowColor }}>{arrow}</TableCell>
+// <TableCell>{type}</TableCell>
+// <TableCell>{type == "Transfer" && isIncoming ? from : "-"}</TableCell>
+// <TableCell>{type == "Transfer" && !isIncoming ? to : "-"}</TableCell>
+// <TableCell>{`$${amount}`}</TableCell>
+// <TableCell>{transactionTiming.toDateString()}</TableCell>
+// <TableCell>{transactionTiming.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</TableCell>
+// </TableRow>
+// );
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+import { useState } from "react";
+import submitForm from "../utils/submitForm";
+import useAxiosProtected from "../hooks/useAxiosProtected";
+
+import { Box, TextField, Button } from "@mui/material";
+
+export default function TransferForm({ setRefresh }) {
+  let axiosInstance = useAxiosProtected();
+  let [to, setTo] = useState("");
+  let [amount, setAmount] = useState(null);
+
+  const handleSubmit = async (e) => {
+    try {
+      let res = await submitForm(e, "/api/v1/user/transactions", axiosInstance);
+      setRefresh((prev) => prev + 1);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  return (
+    <div>
+      <Box
+        sx={{
+          height: "100%",
+          alignContent: "center",
+          maxWidth: 360,
+          borderRadius: 3,
+          border: 1,
+          padding: 1,
+          backgroundColor: "background.paper",
+        }}
+      >
+        <h3>Transfer Form</h3>
+        <form
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+          onSubmit={handleSubmit}
+        >
+          <TextField
+            label="Send To"
+            type="email"
+            id="to"
+            name="to"
+            size="small"
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+            fullWidth
+            required
+          />
+          <TextField
+            label="Amount"
+            id="amount"
+            name="amount"
+            type="number"
+            size="small"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            fullWidth
+            required
+          />
+
+          <Button type="submit" fullWidth variant="contained" color="primary">
+            Send
+          </Button>
+        </form>
+      </Box>
+    </div>
+  );
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+import { useEffect, useState } from "react";
+import useProtectedFetch from "../hooks/useProtectedFetch";
+import {
+  Box,
+  Divider,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import PersonIcon from "@mui/icons-material/Person";
+import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
+import PhoneIcon from "@mui/icons-material/Phone";
+
+export default function UserInfo() {
+  let [details, setDetails] = useState({ userInfo: {} });
+  let { loading, error, data } = useProtectedFetch("api/v1/user/info");
+
+  useEffect(() => {
+    setDetails({ ...data });
+  }, [data]);
+
+  return (
+    <Box>
+      {loading && <p>Loading...</p>}
+      {data && (
+        <Box
+          sx={{
+            width: 1,
+            borderRadius: 3,
+            border: 1,
+            padding: 1,
+            height: "100%",
+            backgroundColor: "background.paper",
+          }}
+        >
+          <List>
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <PersonIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={`${details?.userInfo?.firstName} ${details?.userInfo?.lastName}`}
+                />
+              </ListItemButton>
+            </ListItem>
+            <Divider />
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <AlternateEmailIcon />
+                </ListItemIcon>
+                <ListItemText primary={`${details?.userInfo?.email}`} />
+              </ListItemButton>
+            </ListItem>
+            <Divider />
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <PhoneIcon />
+                </ListItemIcon>
+                <ListItemText primary={`   ${details?.userInfo?.phone}`} />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </Box>
+      )}
+      {/* { error && <p> {`Error - ${error?.msg}`}</p> } */}
+    </Box>
+  );
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+import ActivityTable from "../components/ActivityTable";
+import UserInfo from "../components/UserInfo";
+import TransferForm from "../components/TransferForm";
+import { Box, Typography } from "@mui/material";
+import { useAuthContext } from "../context/UserContext";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+export default function Dashboard() {
+  let { activeUser } = useAuthContext();
+  let navigate = useNavigate();
+  const [refresh, setRefresh] = useState(0);
+
+  useEffect(() => {
+    if (!activeUser?.user) {
+      navigate("/");
+    }
+  }, []);
+
+  return (
+    <Box className="Dashboard" sx={{ alignContent: "center" }}>
+      <Typography variant="h2">Dashboard</Typography>
+      <Box
+        display={"flex"}
+        flexDirection="row"
+        alignItems="stretch"
+        spacing={2}
+        justifyContent={"space-evenly"}
+      >
+        <UserInfo />
+        <TransferForm setRefresh={setRefresh} />
+      </Box>
+      <ActivityTable refresh={refresh} />
+    </Box>
+  );
+}
+

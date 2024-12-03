@@ -1,32 +1,30 @@
 import { createTheme, ThemeProvider, CssBaseline } from "@mui/material";
-import { deepmerge } from '@mui/utils';
 
-export default function WebsiteThemeProvider({children}) {
+export default function WebsiteThemeProvider({ children }) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      { children }
+      {children}
     </ThemeProvider>
-  )
+  );
 }
-
 
 const theme = createTheme({
   palette: {
     mode: "dark",
     background: {
-      default: "#1e2a38", // Dark blue-grey background
-      paper: "#28323e",   // Slightly lighter for paper components
+      default: "#1e2a38",
+      paper: "#28323c",
     },
     primary: {
       main: "#536dfe",
     },
     secondary: {
-      main: "#ff4081", // Accent color
+      main: "#ff4081",
     },
     text: {
-      primary: "#ffffff", // White text
-      secondary: "#cfd8dc", // Muted text
+      primary: "#ffffff",
+      secondary: "#cfd8dc",
     },
   },
   typography: {
@@ -43,7 +41,7 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          textTransform: "none", 
+          textTransform: "none",
           borderRadius: 8,
         },
         containedPrimary: {

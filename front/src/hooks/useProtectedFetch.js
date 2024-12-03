@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import useAxiosProtected from "./useAxiosProtected";
 
-export default function useProtectedFetch(endpoint) {
+export default function useProtectedFetch(endpoint, refresh) {
   let privateAxios = useAxiosProtected();
 
   const [data, setData] = useState(null);
@@ -32,7 +32,7 @@ export default function useProtectedFetch(endpoint) {
     return () => {
       abortController.abort();
     };
-  }, [endpoint]);
+  }, [endpoint, refresh]);
 
   return { data, loading, error };
 }
