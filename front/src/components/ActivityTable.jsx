@@ -1,108 +1,12 @@
-// import { v4 as uuidv4 } from "uuid";
-
-// import Transaction from "./Transaction";
-// import useProtectedFetch from "../hooks/useProtectedFetch";
-// import { useAuthContext } from "../context/UserContext";
-
-// import {
-//   Stack,
-//   TableContainer,
-//   Table,
-//   TableHead,
-//   TableRow,
-//   TableBody,
-//   TableCell,
-// } from "@mui/material";
-
-// export default function ActivityTable() {
-//   let { loading, data, error } = useProtectedFetch("api/v1/user/transactions");
-//   let { activeUser } = useAuthContext();
-
-//   return (
-//     <div className="ActivityTable">
-//       <h3>ActivityTable</h3>
-//       <Balance />
-//       {loading ? (
-//         <div> Loading... </div>
-//       ) : (
-//         // error ?
-//         // <div>{error.msg } </div> :
-//         <TableContainer>
-//           <Table
-//             sx={{ padding: 2, minWidth: 650, border: 1, borderRadius: 3 }}
-//             aria-label="simple table"
-//           >
-//             <TableHead>
-//               <TableRow>
-//                 <TableCell></TableCell>
-//                 <TableCell>Transaction Type</TableCell>
-//                 <TableCell>From</TableCell>
-//                 <TableCell>To</TableCell>
-//                 <TableCell>Amount</TableCell>
-//                 <TableCell>Date</TableCell>
-//                 <TableCell>Time</TableCell>
-//               </TableRow>
-//             </TableHead>
-//             <TableBody>
-//               {data &&
-//                 data.transactions.map((transaction) => {
-//                   return (
-//                     <Transaction
-//                       {...transaction}
-//                       key={uuidv4()}
-//                       user={activeUser.user}
-//                     />
-//                   );
-//                 })}
-//             </TableBody>
-//           </Table>
-//         </TableContainer>
-//       )}
-//     </div>
-//   );
-// }
-
-// function Balance() {
-//   let { loading, error, data } = useProtectedFetch("api/v1/user/balance");
-//   return (
-//     <>
-//       {loading ? (
-//         <div>Loading...</div>
-//       ) : (
-//         <Stack direction="row" spacing={6} justifyContent={"flex-end"}>
-//           <h4>Balance</h4>
-//           {data && (
-//             <h4>
-//               {data.balance.toLocaleString("en-US", {
-//                 style: "currency",
-//                 currency: "USD",
-//               })}
-//             </h4>
-//           )}
-//           {/* { error && <p>{`Error - ${error?.msg}`}</p> } */}
-//         </Stack>
-//       )}
-//     </>
-//   );
-// }
-
 import { useEffect, useState } from "react";
 
-import Transaction from "./Transaction";
 import useProtectedFetch from "../hooks/useProtectedFetch";
 import { useAuthContext } from "../context/UserContext";
 import formatCurrency from "../utils/formatCurrency";
 import { DataGrid } from "@mui/x-data-grid";
-import {
-  Box,
-  Stack,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableBody,
-  TableCell,
-} from "@mui/material";
+import { Box, Stack } from "@mui/material";
+import ArrowDropUpRoundedIcon from "@mui/icons-material/ArrowDropUpRounded";
+import ArrowDropDownRoundedIcon from "@mui/icons-material/ArrowDropDownRounded";
 
 export default function ActivityTable({ refresh }) {
   const [transactions, setTransactions] = useState([]);
@@ -122,9 +26,26 @@ export default function ActivityTable({ refresh }) {
   const columns = [
     {
       field: "direction",
+      headerName: "",
+      flex: 0.05,
       editable: false,
       resizable: false,
-      flex: 0.05,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          {params.value ? (
+            <ArrowDropUpRoundedIcon fontSize="large" color="success" />
+          ) : (
+            <ArrowDropDownRoundedIcon fontSize="large" color="error" />
+          )}
+        </Box>
+      ),
     },
     {
       field: "type",
@@ -176,29 +97,44 @@ export default function ActivityTable({ refresh }) {
   });
 
   return (
-    <Box className="ActivityTable">
-      <h3>ActivityTable</h3>
-      <Balance refresh={refresh} />
+    <Box
+      sx={{ alignContent: "center", justifyContent: "center" }}
+      className="ActivityTable"
+    >
       <Box
         sx={{
-          width: "100%",
-          backgroundColor: "background.paper",
-          height: 500,
-          mb: 3,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "background.default",
         }}
       >
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
-              },
-            },
+        <h3>Transaction History</h3>
+        <Balance refresh={refresh} />
+        <Box
+          sx={{
+            width: "85%",
+            height: "70vh",
+            backgroundColor: "background.paper",
+            boxShadow: 3,
+            borderRadius: 2,
           }}
-          pageSizeOptions={[5, 10, 25]}
-        />
+        >
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 10,
+                },
+              },
+            }}
+            pageSizeOptions={[5, 10, 25, 50]}
+          />
+        </Box>
       </Box>
     </Box>
   );
@@ -227,14 +163,12 @@ function Balance({ refresh }) {
 function formatTransaction({ from, to, amount, time, user, index }) {
   let type = from == to ? "Deposit" : "Transfer";
   let isIncoming = to == user ? true : false;
-  let arrowColor = isIncoming ? "green" : "red";
-  let arrow = isIncoming ? "▲" : "▼";
   let transactionTiming = new Date(time);
   let other = type == "Deposit" ? "-" : isIncoming ? from : to;
 
   return {
     id: index,
-    direction: arrow,
+    direction: isIncoming,
     type,
     "from/to": other,
     amount,
