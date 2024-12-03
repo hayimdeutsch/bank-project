@@ -1,18 +1,15 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import ActivityTable from "../components/ActivityTable";
 import UserInfo from "../components/UserInfo";
 import TransferForm from "../components/TransferForm";
-import { Stack, Button } from "@mui/material";
 import { useAuthContext } from "../context/UserContext";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Box, Typography } from "@mui/material";
 
 export default function Dashboard() {
   let { activeUser } = useAuthContext();
   let navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const [refresh, setRefresh] = useState(0);
 
   useEffect(() => {
     if (!activeUser?.user) {
@@ -21,18 +18,19 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="Dashboard">
-      <Stack
-        direction="row"
+    <Box className="Dashboard" sx={{ alignContent: "center" }}>
+      <Typography variant="h3">Dashboard</Typography>
+      <Box
+        display={"flex"}
+        flexDirection="row"
         alignItems="stretch"
         spacing={2}
-        justifyContent={"space-around"}
+        justifyContent={"space-evenly"}
       >
         <UserInfo />
-        <Button onClick={handleOpen}>Send Money</Button>
-        <TransferForm open={open} handleClose={handleClose} />
-      </Stack>
-      <ActivityTable />
-    </div>
+        <TransferForm setRefresh={setRefresh} />
+      </Box>
+      <ActivityTable refresh={refresh} />
+    </Box>
   );
 }
