@@ -66,13 +66,14 @@ export const getUserTransactionsByEmail = async function (email) {
 export const getAllUsers = async function () {
   try {
     const results = await User.find({ })
-    .select({ _id: 1, phone: 1, firstName: 1, lastName: 1})
+    .select({ transactions: 0})
 
     const users = results.map((doc) => ({
       email: doc._id,
       firstName: doc.firstName,
       lastName: doc.lastName,
-      phone: doc.phone 
+      phone: doc.phone,
+      balance: doc.balance,
     }));
 
     return users;
@@ -115,6 +116,12 @@ export const postDeposit = async function (user, amount) {
     amount,
   });
 
+  try {
+    await transaction.validate();
+  } catch(err) {
+    throw new BankError("Invalid Input", 400);
+  }
+
   let session = await mongoose.connection.startSession();
   try {
     session.startTransaction();
@@ -126,6 +133,7 @@ export const postDeposit = async function (user, amount) {
       }, {session});
       await session.commitTransaction()
   } catch (err) {
+    console.log(err);
     await session.abortTransaction();
     throw new BankError("DB Error", 500);
   } finally {
