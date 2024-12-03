@@ -62,7 +62,7 @@ export const postTransactions = async (req, res, next) => {
             throw new BankError("Recipient not found", 400);
         }
 
-        if (fromUser.balance < amount) {
+        if (Number(fromUser.balance) < Number(amount)) {
             throw new BankError("Insufficient funds", 400);
         }
         await postTransaction(from, to, amount);
