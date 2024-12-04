@@ -5,7 +5,7 @@ const sendMissingFieldErrors = (req, res, next) => {
   if (!errors.isEmpty()) {
     let errorFields = [];
     errors.array().map(err=> errorFields.push(err.path));
-      return res.status(422).json({msg: "Invalid input", 'fields': errorFields});
+      return res.status(400).json({message: "Invalid input", 'fields': errorFields});
   }
   next();
 }
