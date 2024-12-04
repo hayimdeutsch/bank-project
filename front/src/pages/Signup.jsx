@@ -8,8 +8,6 @@ import {
   Box,
   Button,
   TextField,
-  FormLabel,
-  FormControl,
   FormGroup,
   Typography,
   Divider,
@@ -19,7 +17,8 @@ import {
 
 export default function Signup() {
   const [error, setError] = useState("");
-  let [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isValidSignUp, setIsValidSignUp] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -27,8 +26,6 @@ export default function Signup() {
     phone: "",
     password: "",
   });
-  const [isValidSignUp, setIsValidSignUp] = useState(false);
-  const handleClose = () => setIsValidSignUp(true);
 
   const handleChange = (event) => {
     setError("");
@@ -167,66 +164,154 @@ export default function Signup() {
           </FormGroup>
         </form>
       </Box>
-      <ActivationForm open={isValidSignUp} handleClose={handleClose} />
+      <ActivationForm
+        open={isValidSignUp}
+        setOpen={setIsValidSignUp}
+        userInfo={formData}
+      />
     </Box>
   );
 }
 
-function ActivationForm({ open, handleClose }) {
+function ActivationForm({ open, setOpen, userInfo }) {
   const [code, setCode] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [resendStatus, setResendStatus] = useState("");
   const navigate = useNavigate();
 
+  const handleResendCode = async () => {
+    try {
+      setResendStatus("Resending...");
+      await axios.post("/api/v1/signup/confirmation/resend", {
+        email: userInfo.email,
+      });
+      setResendStatus("Code resent successfully!");
+    } catch (err) {
+      console.error("Error resending code:", err);
+      setResendStatus("Failed to resend code. Please try again later.");
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   const handleSubmit = async (event) => {
+    event.preventDefault();
     try {
       await sendForm(event, "api/v1/signup/confirmation", axios);
-      handleClose();
-      navigate("/");
-    } catch (error) {
-      console.error("Activation error:", error);
+      setSuccess(true);
+      setError("");
+      setCode("");
+    } catch (err) {
+      console.error("Activation error:", err);
+      if (err.response?.data?.message === "Code expired") {
+        setError("The activation code has expired. You must sign up again.");
+      } else {
+        setError("Confirmation failed. Please try again.");
+      }
     }
+  };
+
+  const handleNavigateHome = () => {
+    setOpen(false);
+    navigate("/");
   };
 
   return (
     <Dialog
       open={open}
-      onClose={handleClose}
+      // onClose={handleClose}
       sx={{ "& .MuiPaper-root": { backgroundColor: "background.paper" } }}
     >
       <Box sx={{ padding: 4, maxWidth: 400, margin: "auto" }}>
         <Typography variant="h6" gutterBottom>
-          Confirm Your Account
+          {success ? "Account Activated!" : "Confirm Your Account"}
         </Typography>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          Enter the confirmation code sent to your email.
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <FormGroup sx={{ gap: 2 }}>
-            <FormControl>
-              <FormLabel htmlFor="confirmationCode">
-                Confirmation Code
-              </FormLabel>
-              <TextField
-                id="confirmationCode"
-                name="confirmationCode"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                required
-                fullWidth
-              />
-            </FormControl>
+
+        {success ? (
+          <>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Your account has been successfully activated. You must go to home
+              page to log in.
+            </Typography>
             <Button
-              type="submit"
               variant="contained"
+              onClick={handleNavigateHome}
               fullWidth
               sx={{
                 background: "linear-gradient(90deg, #536dfe 0%, #82b1ff 100%)",
                 color: "white",
               }}
             >
-              Confirm Account
+              Go to Homepage
             </Button>
-          </FormGroup>
-        </form>
+          </>
+        ) : (
+          <>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Enter the confirmation code sent to your email.
+            </Typography>
+            <form onSubmit={handleSubmit}>
+              <FormGroup sx={{ gap: 2 }}>
+                <TextField
+                  label="Confirmation Code"
+                  id="confirmationCode"
+                  name="confirmationCode"
+                  value={code}
+                  onChange={(e) => {
+                    setError("");
+                    setCode(e.target.value);
+                  }}
+                  required
+                  fullWidth
+                />
+              </FormGroup>
+              {error ? (
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="secondary"
+                  size="large"
+                  sx={{ mt: 3 }}
+                >
+                  {error}
+                </Button>
+              ) : (
+                <Button
+                  size="large"
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  sx={{ mt: 3 }}
+                >
+                  Confirm Account
+                </Button>
+              )}
+            </form>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ marginTop: 2 }}
+            >
+              Didn’t receive a code?{" "}
+              <Button
+                variant="text"
+                onClick={handleResendCode}
+                sx={{ textTransform: "none" }}
+              >
+                Resend Code
+              </Button>
+            </Typography>
+            {resendStatus && (
+              <Typography variant="body2" color="text.secondary">
+                {resendStatus}
+              </Typography>
+            )}
+          </>
+        )}
       </Box>
     </Dialog>
   );
