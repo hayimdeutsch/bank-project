@@ -4,20 +4,28 @@ import useProtectedFetch from "../hooks/useProtectedFetch";
 import { useAuthContext } from "../context/UserContext";
 import formatCurrency from "../utils/formatCurrency";
 import { DataGrid } from "@mui/x-data-grid";
-import { Box, Stack } from "@mui/material";
+import { Box, Typography, Stack } from "@mui/material";
 import ArrowDropUpRoundedIcon from "@mui/icons-material/ArrowDropUpRounded";
 import ArrowDropDownRoundedIcon from "@mui/icons-material/ArrowDropDownRounded";
 
 export default function ActivityTable({ refresh }) {
   const [transactions, setTransactions] = useState([]);
-  const { activeUser } = useAuthContext();
-  let { data } = useProtectedFetch("api/v1/user/transactions", refresh);
+  let { activeUser } = useAuthContext();
+  let { data: transactionData } = useProtectedFetch(
+    "api/v1/user/transactions",
+    refresh
+  );
+  let {
+    loading: loadingBalance,
+    error: balanceError,
+    data: balance,
+  } = useProtectedFetch("api/v1/user/balance", refresh);
 
   useEffect(() => {
-    if (data) {
-      setTransactions(data.transactions);
+    if (transactionData) {
+      setTransactions(transactionData.transactions);
     }
-  }, [data]);
+  }, [transactionData]);
 
   const columns = [
     {
@@ -93,7 +101,14 @@ export default function ActivityTable({ refresh }) {
   });
 
   return (
-    <Box width={"100%"} className="ActivityTable">
+    <Box
+      width="100%"
+      className="ActivityTable"
+      sx={{
+        mx: "auto",
+        my: 3,
+      }}
+    >
       <Box
         sx={{
           py: "2%",
@@ -101,17 +116,34 @@ export default function ActivityTable({ refresh }) {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "background.default",
         }}
       >
-        <h2>Transaction History</h2>
         <Box
           sx={{
+            width: "85%",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography sx={{ my: 2 }} variant="h4">
+            Transaction History
+          </Typography>
+          <Stack direction="row" spacing={3}>
+            <h2>Balance</h2>
+            {balance && <h2>{formatCurrency(balance.balance)}</h2>}
+          </Stack>
+        </Box>
+
+        <Box
+          sx={{
+            width: "85%",
+            height: "70vh",
+            border: 1,
             backgroundColor: "background.paper",
             boxShadow: 3,
-            border: 1,
             borderRadius: 2,
-            width: "90%",
           }}
         >
           <DataGrid

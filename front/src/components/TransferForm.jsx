@@ -2,21 +2,28 @@ import { useState } from "react";
 import submitForm from "../utils/submitForm";
 import useAxiosProtected from "../hooks/useAxiosProtected";
 
-import { Box, TextField, Button } from "@mui/material";
+import { Box, TextField, Button, Typography } from "@mui/material";
 
 export default function TransferForm({ setRefresh }) {
-  let privateAxios = useAxiosProtected();
-  let [to, setTo] = useState("");
-  let [amount, setAmount] = useState("");
+  const privateAxios = useAxiosProtected();
+  const [error, setError] = useState("");
+  const [to, setTo] = useState("");
+  const [amount, setAmount] = useState("");
 
   const handleSubmit = async (e) => {
     try {
       let res = await submitForm(e, "/api/v1/user/transactions", privateAxios);
-      setRefresh((prev) => prev + 1);
-      setTo("");
-      setAmount("");
+      if (res.status === 200) {
+        setRefresh((prev) => prev + 1);
+        setTo("");
+        setAmount("");
+      }
     } catch (err) {
-      alert("Transfer failed");
+      if (err.status === 422) {
+        setError("Recipient must be input as Email!");
+      } else if (err.status === 400) {
+        setError(err.response.data.message);
+      }
       console.log(err);
     }
   };
@@ -33,11 +40,13 @@ export default function TransferForm({ setRefresh }) {
         backgroundColor: "background.paper",
       }}
     >
-      <h3>Transfer Form</h3>
+      <Typography mb={2} variant="h5">
+        Transfer Form
+      </Typography>
       <form
         style={{
           display: "flex",
-          flexDirection: "row",
+          flexDirection: "column",
           alignItems: "center",
           gap: "10px",
         }}
@@ -50,7 +59,10 @@ export default function TransferForm({ setRefresh }) {
           name="to"
           size="small"
           value={to}
-          onChange={(e) => setTo(e.target.value)}
+          onChange={(e) => {
+            setError("");
+            setTo(e.target.value);
+          }}
           fullWidth
           required
         />
@@ -61,14 +73,22 @@ export default function TransferForm({ setRefresh }) {
           type="number"
           size="small"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={(e) => {
+            setError("");
+            setAmount(e.target.value);
+          }}
           fullWidth
           required
         />
-
-        <Button type="submit" fullWidth variant="contained" color="primary">
-          Send
-        </Button>
+        {error ? (
+          <Button type="submit" fullWidth variant="contained" color="secondary">
+            {error}
+          </Button>
+        ) : (
+          <Button type="submit" fullWidth variant="contained" color="primary">
+            Send
+          </Button>
+        )}
       </form>
     </Box>
   );

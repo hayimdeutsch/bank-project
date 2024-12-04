@@ -27,25 +27,24 @@ export default function Dashboard() {
       alignItems="center"
       justifyContent="center"
     >
-      <Typography pb={6} variant="h3">
+      <Typography my={4} variant="h3">
         Dashboard
       </Typography>
       <Grid
         container
-        spacing={4}
+        spacing={10}
         alignContent="center"
         justifyContent={"space-between"}
         sx={{
           backgroundColor: "background.default",
           color: "text.primary",
-          width: "90%",
+          width: "85%",
         }}
       >
-        <Grid height={"100%"} size={{ xs: 12, md: 4 }}>
-          <UserInfo />
+        <Grid size={{ xs: 12, md: 6 }}>
+          <UserInfo refresh={refresh} />
         </Grid>
-        <Grid height={"100%"} size={{ xs: 12, md: 8 }}>
-          <Balance refresh={refresh} />
+        <Grid height={"100%"} size={{ xs: 12, md: 6 }}>
           <TransferForm setRefresh={setRefresh} />
         </Grid>
       </Grid>
