@@ -22,7 +22,7 @@ export default function UserInfo() {
   }, [data]);
 
   return (
-    <Box>
+    <Box sx={{ width: "100%", height: "100%" }}>
       {loading && <p>Loading...</p>}
       {data && (
         <Box
@@ -32,6 +32,7 @@ export default function UserInfo() {
             border: 1,
             padding: 1,
             height: "100%",
+            width: "100%",
             backgroundColor: "background.paper",
           }}
         >

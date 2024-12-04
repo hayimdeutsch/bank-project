@@ -5,15 +5,18 @@ import useAxiosProtected from "../hooks/useAxiosProtected";
 import { Box, TextField, Button } from "@mui/material";
 
 export default function TransferForm({ setRefresh }) {
-  let axiosInstance = useAxiosProtected();
+  let privateAxios = useAxiosProtected();
   let [to, setTo] = useState("");
   let [amount, setAmount] = useState("");
 
   const handleSubmit = async (e) => {
     try {
-      let res = await submitForm(e, "/api/v1/user/transactions", axiosInstance);
+      let res = await submitForm(e, "/api/v1/user/transactions", privateAxios);
       setRefresh((prev) => prev + 1);
+      setTo("");
+      setAmount("");
     } catch (err) {
+      alert("Transfer failed");
       console.log(err);
     }
   };
@@ -22,11 +25,11 @@ export default function TransferForm({ setRefresh }) {
     <Box
       sx={{
         height: "100%",
+        width: "100%",
         alignContent: "center",
-        maxWidth: 360,
         borderRadius: 3,
         border: 1,
-        padding: 1,
+        padding: 2,
         backgroundColor: "background.paper",
       }}
     >
@@ -34,8 +37,7 @@ export default function TransferForm({ setRefresh }) {
       <form
         style={{
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
+          flexDirection: "row",
           alignItems: "center",
           gap: "10px",
         }}

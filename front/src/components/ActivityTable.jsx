@@ -10,15 +10,11 @@ import ArrowDropDownRoundedIcon from "@mui/icons-material/ArrowDropDownRounded";
 
 export default function ActivityTable({ refresh }) {
   const [transactions, setTransactions] = useState([]);
-  let { activeUser } = useAuthContext();
-  let { loading, data, error } = useProtectedFetch(
-    "api/v1/user/transactions",
-    refresh
-  );
+  const { activeUser } = useAuthContext();
+  let { data } = useProtectedFetch("api/v1/user/transactions", refresh);
 
   useEffect(() => {
     if (data) {
-      console.log(data);
       setTransactions(data.transactions);
     }
   }, [data]);
@@ -97,29 +93,25 @@ export default function ActivityTable({ refresh }) {
   });
 
   return (
-    <Box
-      sx={{ alignContent: "center", justifyContent: "center" }}
-      className="ActivityTable"
-    >
+    <Box width={"100%"} className="ActivityTable">
       <Box
         sx={{
+          py: "2%",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          height: "100vh",
           backgroundColor: "background.default",
         }}
       >
-        <h3>Transaction History</h3>
-        <Balance refresh={refresh} />
+        <h2>Transaction History</h2>
         <Box
           sx={{
-            width: "85%",
-            height: "70vh",
             backgroundColor: "background.paper",
             boxShadow: 3,
+            border: 1,
             borderRadius: 2,
+            width: "90%",
           }}
         >
           <DataGrid
@@ -137,26 +129,6 @@ export default function ActivityTable({ refresh }) {
         </Box>
       </Box>
     </Box>
-  );
-}
-
-function Balance({ refresh }) {
-  let { loading, error, data } = useProtectedFetch(
-    "api/v1/user/balance",
-    refresh
-  );
-  return (
-    <>
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
-        <Stack direction="row" spacing={6} justifyContent={"flex-end"}>
-          <h4>Balance</h4>
-          {data && <h4>{formatCurrency(data.balance)}</h4>}
-          {/* { error && <p>{`Error - ${error?.msg}`}</p> } */}
-        </Stack>
-      )}
-    </>
   );
 }
 

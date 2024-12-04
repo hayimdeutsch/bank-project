@@ -11,9 +11,9 @@ export default function Home() {
   return (
     <Grid
       container
-      spacing={4}
+      spacing={6}
       alignItems="center"
-      justifyContent="center"
+      justifyContent={"space-evenly"}
       sx={{
         padding: 4,
         backgroundColor: "background.default",
@@ -21,8 +21,7 @@ export default function Home() {
       }}
     >
       <Grid
-        xs={12}
-        md={6}
+        size={{ sm: 12, md: 6 }}
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -50,8 +49,7 @@ export default function Home() {
         </Button>
       </Grid>
       <Grid
-        xs={12}
-        md={6}
+        size={{ sm: 12, md: 6 }}
         sx={{
           display: "flex",
           flexDirection: "column",
