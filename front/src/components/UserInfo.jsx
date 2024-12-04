@@ -36,7 +36,6 @@ export default function UserInfo({ refresh }) {
       {userInfo && (
         <Box
           sx={{
-            width: 1,
             borderRadius: 3,
             border: 1,
             padding: 2,
