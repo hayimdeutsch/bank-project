@@ -8,6 +8,7 @@ export default function Home() {
   const handleClick = () => {
     navigate("/signup");
   };
+
   return (
     <Grid
       container

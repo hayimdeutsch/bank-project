@@ -13,7 +13,6 @@ export default function Header() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handleOpen = () => setIsLoggingIn(true);
-  const handleClose = () => setIsLoggingIn(false);
 
   const handleClick = () => {
     logout();
@@ -57,7 +56,7 @@ export default function Header() {
           </Button>
           <LoginForm
             open={isLoggingIn}
-            handleClose={handleClose}
+            setOpen={setIsLoggingIn}
             submitTo={"api/v1/login"}
             next={"/dashboard"}
           />

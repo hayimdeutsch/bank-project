@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import sendForm from "../utils/submitForm";
 import axios from "../utils/api";
-
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   Dialog,
   Box,
@@ -13,9 +13,13 @@ import {
   FormGroup,
   Typography,
   Divider,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
 
 export default function Signup() {
+  const [error, setError] = useState("");
+  let [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -27,6 +31,7 @@ export default function Signup() {
   const handleClose = () => setIsValidSignUp(true);
 
   const handleChange = (event) => {
+    setError("");
     const { name, value } = event.target;
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
@@ -36,6 +41,9 @@ export default function Signup() {
       await sendForm(event, "api/v1/signup", axios);
       setIsValidSignUp(true);
     } catch (error) {
+      if (error.status === 400 || error.status === 409) {
+        setError(error?.response?.data?.message || "");
+      }
       console.error("Signup error:", error);
     }
   };
@@ -72,33 +80,90 @@ export default function Signup() {
         <Divider sx={{ my: 2 }} />
         <form onSubmit={handleSubmit}>
           <FormGroup sx={{ gap: 2 }}>
-            {["firstName", "lastName", "email", "phone", "password"].map(
-              (field) => (
-                <FormControl key={field}>
-                  <TextField
-                    label={field.charAt(0).toUpperCase() + field.slice(1)}
-                    id={field}
-                    name={field}
-                    type={field === "password" ? "password" : "text"}
-                    value={formData[field]}
-                    onChange={handleChange}
-                    required
-                    fullWidth
-                  />
-                </FormControl>
-              )
-            )}
-            <Button
-              type="submit"
-              variant="contained"
+            <TextField
+              label="First Name"
+              id="firstName"
+              name="firstName"
+              type="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
               fullWidth
-              sx={{
-                background: "linear-gradient(90deg, #536dfe 0%, #82b1ff 100%)",
-                color: "white",
+              required
+            />
+            <TextField
+              label="Last Name"
+              id="lastName"
+              name="lastName"
+              type="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              fullWidth
+              required
+            />
+            <TextField
+              label="Email"
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              fullWidth
+              required
+            />
+            <TextField
+              label="Phone"
+              id="phone"
+              name="phone"
+              type="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              fullWidth
+              required
+            />
+            <TextField
+              label="Password"
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              value={formData.password}
+              onChange={handleChange}
+              fullWidth
+              required
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
               }}
-            >
-              Sign Up
-            </Button>
+            />
+            {error ? (
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="secondary"
+              >
+                {error}
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                size="large"
+              >
+                Send
+              </Button>
+            )}
           </FormGroup>
         </form>
       </Box>
