@@ -27,11 +27,19 @@ export default function ActivityTable({ refresh }) {
     }
   }, [transactionData]);
 
+  const options = {
+    year: "2-digit",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  };
+
   const columns = [
     {
       field: "direction",
       headerName: "",
-      flex: 0.1,
+      flex: 0.05,
       editable: false,
       resizable: false,
       renderCell: (params) => (
@@ -53,8 +61,9 @@ export default function ActivityTable({ refresh }) {
     },
     {
       field: "type",
-      headerName: "Transaction Type",
+      headerName: "Type",
       headerAlign: "center",
+      align: "center",
       editable: false,
       resizable: false,
       flex: 0.2,
@@ -65,22 +74,24 @@ export default function ActivityTable({ refresh }) {
       headerAlign: "center",
       editable: false,
       resizable: false,
-      flex: 0.25,
+      flex: 0.3,
     },
     {
       field: "date",
       headerName: "Date",
       headerAlign: "center",
+      align: "center",
+      flex: 0.3,
+      renderCell: (params) =>
+        (params?.row?.date).toLocaleDateString(undefined, options),
       resizable: false,
-      flex: 0.25,
     },
     {
       field: "amount",
       headerName: "Amount",
       headerAlign: "center",
-      align: "right",
       editable: false,
-      flex: 0.15,
+      flex: 0.2,
       renderCell: (params) => formatCurrency(params.row?.amount),
       sortComparator: (v1, v2) => Number(v1) - Number(v2),
       resizable: false,
@@ -153,7 +164,7 @@ export default function ActivityTable({ refresh }) {
               "& .MuiDataGrid-cell": {
                 display: "flex",
                 alignItems: "center",
-                padding: "30px",
+                justifyContent: "center",
               },
               fontSize: "1.2rem",
               lineHeight: "1.5",
@@ -180,13 +191,6 @@ function formatTransaction({ from, to, amount, time, user, index }) {
   let type = from == to ? "Deposit" : "Transfer";
   let isIncoming = to == user ? true : false;
   let other = type == "Deposit" ? "-" : isIncoming ? from : to;
-  const options = {
-    year: "2-digit",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-  };
 
   return {
     id: index,
@@ -194,6 +198,6 @@ function formatTransaction({ from, to, amount, time, user, index }) {
     type,
     "from/to": other,
     amount,
-    date: new Date(time).toLocaleDateString(undefined, options),
+    date: new Date(time),
   };
 }
