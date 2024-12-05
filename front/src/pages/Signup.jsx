@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import sendForm from "../utils/submitForm";
 import axios from "../utils/api";
+import ActivationForm from "../components/ActivationForm";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   Dialog,
@@ -26,6 +27,12 @@ export default function Signup() {
     phone: "",
     password: "",
   });
+
+  useEffect(() => {
+    if (formData.email) {
+      localStorage.setItem("userEmail", formData.email);
+    }
+  }, [formData.email]);
 
   const handleChange = (event) => {
     setError("");
@@ -170,149 +177,5 @@ export default function Signup() {
         userInfo={formData}
       />
     </Box>
-  );
-}
-
-function ActivationForm({ open, setOpen, userInfo }) {
-  const [code, setCode] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [resendStatus, setResendStatus] = useState("");
-  const navigate = useNavigate();
-
-  const handleResendCode = async () => {
-    try {
-      setResendStatus("Resending...");
-      await axios.post("/api/v1/signup/confirmation/resend", {
-        email: userInfo.email,
-      });
-      setResendStatus("Code resent successfully!");
-    } catch (err) {
-      console.error("Error resending code:", err);
-      setResendStatus("Failed to resend code. Please try again later.");
-    }
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      await sendForm(event, "api/v1/signup/confirmation", axios);
-      setSuccess(true);
-      setError("");
-      setCode("");
-    } catch (err) {
-      console.error("Activation error:", err);
-      if (err.response?.data?.message === "Code expired") {
-        setError("The activation code has expired. You must sign up again.");
-      } else {
-        setError("Confirmation failed. Please try again.");
-      }
-    }
-  };
-
-  const handleNavigateHome = () => {
-    setOpen(false);
-    navigate("/");
-  };
-
-  return (
-    <Dialog
-      open={open}
-      // onClose={handleClose}
-      sx={{ "& .MuiPaper-root": { backgroundColor: "background.paper" } }}
-    >
-      <Box sx={{ padding: 4, maxWidth: 400, margin: "auto" }}>
-        <Typography variant="h6" gutterBottom>
-          {success ? "Account Activated!" : "Confirm Your Account"}
-        </Typography>
-
-        {success ? (
-          <>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              Your account has been successfully activated. You must go to home
-              page to log in.
-            </Typography>
-            <Button
-              variant="contained"
-              onClick={handleNavigateHome}
-              fullWidth
-              sx={{
-                background: "linear-gradient(90deg, #536dfe 0%, #82b1ff 100%)",
-                color: "white",
-              }}
-            >
-              Go to Homepage
-            </Button>
-          </>
-        ) : (
-          <>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              Enter the confirmation code sent to your email.
-            </Typography>
-            <form onSubmit={handleSubmit}>
-              <FormGroup sx={{ gap: 2 }}>
-                <TextField
-                  label="Confirmation Code"
-                  id="confirmationCode"
-                  name="confirmationCode"
-                  value={code}
-                  onChange={(e) => {
-                    setError("");
-                    setCode(e.target.value);
-                  }}
-                  required
-                  fullWidth
-                />
-              </FormGroup>
-              {error ? (
-                <Button
-                  fullWidth
-                  variant="contained"
-                  color="secondary"
-                  size="large"
-                  sx={{ mt: 3 }}
-                >
-                  {error}
-                </Button>
-              ) : (
-                <Button
-                  size="large"
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  sx={{ mt: 3 }}
-                >
-                  Confirm Account
-                </Button>
-              )}
-            </form>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ marginTop: 2 }}
-            >
-              Didn’t receive a code?{" "}
-              <Button
-                variant="text"
-                onClick={handleResendCode}
-                sx={{ textTransform: "none" }}
-              >
-                Resend Code
-              </Button>
-            </Typography>
-            {resendStatus && (
-              <Typography variant="body2" color="text.secondary">
-                {resendStatus}
-              </Typography>
-            )}
-          </>
-        )}
-      </Box>
-    </Dialog>
   );
 }
