@@ -37,31 +37,41 @@ export default function Header() {
 
   return (
     <AppBar sx={{ width: "100%" }} position="sticky" className="Header">
-      {loggedIn ? (
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Typography sx={{ fontWeight: "bold" }} variant="h2" className="logo">
-            <NavLink to={next}>MO Bank</NavLink>
-          </Typography>
-          <Button color={"inherit"} onClick={handleClick}>
-            <Typography variant="h6">Logout</Typography>
-          </Button>
-        </Toolbar>
-      ) : (
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Typography sx={{ fontWeight: "bold" }} variant="h2" className="logo">
-            <NavLink to={next}>MO Bank</NavLink>
-          </Typography>
-          <Button color={"inherit"} size="small" onClick={handleOpen}>
-            <Typography variant="h6">Login</Typography>
-          </Button>
-          <LoginForm
-            open={isLoggingIn}
-            setOpen={setIsLoggingIn}
-            submitTo={"api/v1/login"}
-            next={"/dashboard"}
-          />
-        </Toolbar>
-      )}
+      <Toolbar sx={{ justifyContent: "space-between" }}>
+        {loggedIn ? (
+          <>
+            <Typography
+              sx={{ fontWeight: "bold" }}
+              variant="h2"
+              className="logo"
+            >
+              <NavLink to={next}>MO Bank</NavLink>
+            </Typography>
+            <Button color={"inherit"} onClick={handleClick}>
+              <Typography variant="h6">Logout</Typography>
+            </Button>
+          </>
+        ) : (
+          <>
+            <Typography
+              sx={{ fontWeight: "bold" }}
+              variant="h2"
+              className="logo"
+            >
+              <NavLink to={next}>MO Bank</NavLink>
+            </Typography>
+            <Button color={"inherit"} size="small" onClick={handleOpen}>
+              <Typography variant="h6">Login</Typography>
+            </Button>
+            <LoginForm
+              open={isLoggingIn}
+              setOpen={setIsLoggingIn}
+              submitTo={"api/v1/login"}
+              next={"/dashboard"}
+            />
+          </>
+        )}
+      </Toolbar>
     </AppBar>
   );
 }

@@ -37,10 +37,15 @@ export default function TransferForm({ setRefresh }) {
         borderRadius: 3,
         border: 1,
         padding: 2,
+        display: "flex",
+        flexDirection: "column",
         backgroundColor: "background.paper",
       }}
     >
-      <Typography mb={2} variant="h5">
+      <Typography
+        sx={{ alignSelf: "center", mb: 2, fontWeight: "bold" }}
+        variant="h5"
+      >
         Transfer Form
       </Typography>
       <form

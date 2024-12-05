@@ -47,7 +47,10 @@ export default function UserInfo({ refresh }) {
             justifyContent: "center",
           }}
         >
-          <Typography sx={{ pl: 1 }} variant="h5">
+          <Typography
+            sx={{ alignSelf: "center", fontWeight: "bold" }}
+            variant="h5"
+          >
             User Info
           </Typography>
           <List>
@@ -59,7 +62,7 @@ export default function UserInfo({ refresh }) {
                 <ListItemText
                   primary={`${userInfo?.userInfo?.firstName} ${userInfo?.userInfo?.lastName}`}
                   primaryTypographyProps={{
-                    sx: { textAlign: "right" },
+                    sx: { textAlign: "right", fontWeight: "bold" },
                   }}
                 />
               </ListItemButton>
@@ -73,7 +76,7 @@ export default function UserInfo({ refresh }) {
                 <ListItemText
                   primary={`${userInfo?.userInfo?.email}`}
                   primaryTypographyProps={{
-                    sx: { textAlign: "right" },
+                    sx: { textAlign: "right", fontWeight: "bold" },
                   }}
                 />
               </ListItemButton>
@@ -87,7 +90,7 @@ export default function UserInfo({ refresh }) {
                 <ListItemText
                   primary={`${userInfo?.userInfo?.phone}`}
                   primaryTypographyProps={{
-                    sx: { textAlign: "right" },
+                    sx: { textAlign: "right", fontWeight: "bold" },
                   }}
                 />
               </ListItemButton>

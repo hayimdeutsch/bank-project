@@ -272,9 +272,24 @@ export default function ActivationForm({ open, setOpen, userInfo }) {
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
-
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+      const deletePendingUser = async () => {
+        if (emailRef.current) {
+          try {
+            await axios.post("api/v1/signup/cancel", {
+              email: emailRef.current,
+            });
+            console.log("Pending user deleted successfully");
+          } catch (error) {
+            console.error("Error deleting user:", error);
+          } finally {
+            localStorage.removeItem("userEmail"); // Always remove the email from localStorage
+          }
+        }
+      };
+
+      deletePendingUser();
+      window.removeEventListener("beforeunload", handleBeforeUnload); // Cleanup listener
     };
   }, []);
 

@@ -31,7 +31,7 @@ export default function ActivityTable({ refresh }) {
     {
       field: "direction",
       headerName: "",
-      flex: 0.05,
+      flex: 0.1,
       editable: false,
       resizable: false,
       renderCell: (params) => (
@@ -57,7 +57,7 @@ export default function ActivityTable({ refresh }) {
       headerAlign: "center",
       editable: false,
       resizable: false,
-      flex: 0.1,
+      flex: 0.2,
     },
     {
       field: "from/to",
@@ -65,30 +65,25 @@ export default function ActivityTable({ refresh }) {
       headerAlign: "center",
       editable: false,
       resizable: false,
-      flex: 0.2,
-    },
-    {
-      field: "amount",
-      headerName: "Amount",
-      headerAlign: "center",
-      editable: false,
-      resizable: false,
-      flex: 0.15,
-      valueGetter: (amount) => formatCurrency(amount),
+      flex: 0.25,
     },
     {
       field: "date",
       headerName: "Date",
       headerAlign: "center",
       resizable: false,
-      flex: 0.2,
+      flex: 0.25,
     },
     {
-      field: "time",
-      headerName: "Time",
+      field: "amount",
+      headerName: "Amount",
       headerAlign: "center",
+      align: "right",
+      editable: false,
+      flex: 0.15,
+      renderCell: (params) => formatCurrency(params.row?.amount),
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
       resizable: false,
-      flex: 0.1,
     },
   ];
 
@@ -131,8 +126,12 @@ export default function ActivityTable({ refresh }) {
             Transaction History
           </Typography>
           <Stack direction="row" spacing={3}>
-            <h2>Balance</h2>
-            {balance && <h2>{formatCurrency(balance.balance)}</h2>}
+            <Typography variant="h5">Balance</Typography>
+            {balance && (
+              <Typography variant="h5">
+                {formatCurrency(balance.balance)}
+              </Typography>
+            )}
           </Stack>
         </Box>
 
@@ -149,7 +148,20 @@ export default function ActivityTable({ refresh }) {
           <DataGrid
             rows={rows}
             columns={columns}
+            rowHeight={56}
+            sx={{
+              "& .MuiDataGrid-cell": {
+                display: "flex",
+                alignItems: "center",
+                padding: "30px",
+              },
+              fontSize: "1.2rem",
+              lineHeight: "1.5",
+            }}
             initialState={{
+              sorting: {
+                sortModel: [{ field: "date", sort: "desc" }],
+              },
               pagination: {
                 paginationModel: {
                   pageSize: 10,
@@ -167,8 +179,14 @@ export default function ActivityTable({ refresh }) {
 function formatTransaction({ from, to, amount, time, user, index }) {
   let type = from == to ? "Deposit" : "Transfer";
   let isIncoming = to == user ? true : false;
-  let transactionTiming = new Date(time);
   let other = type == "Deposit" ? "-" : isIncoming ? from : to;
+  const options = {
+    year: "2-digit",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  };
 
   return {
     id: index,
@@ -176,10 +194,6 @@ function formatTransaction({ from, to, amount, time, user, index }) {
     type,
     "from/to": other,
     amount,
-    date: transactionTiming.toDateString(),
-    time: transactionTiming.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
+    date: new Date(time).toLocaleDateString(undefined, options),
   };
 }
