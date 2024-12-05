@@ -3,10 +3,9 @@ import BankError from '../utils/bankError.js';
 import { expirationTime } from '../config.js';
 import { sendConfirmationCode } from '../utils/sendEmail.js';
 import { 
-    getPendingUserByCode, 
     checkIfEmailTaken, 
     addPendingUser, 
-    deletePendingUserByCode,
+    deletePendingUserByEmail,
     addUser,
     getPendingUserByEmail,
     updatePendingUserByEmail
@@ -28,8 +27,7 @@ export const signUp = async (req, res, next) => {
         sendConfirmationCode(newUser.email, newUser.confirmationCode);
         res.status(202).json({
             success: true,
-            msg: "User Added Successfully", 
-            // confirmationCode: newUser.confirmationCode 
+            message: "User Added Successfully", 
         });
     } catch (error) {
         next(error);
@@ -38,12 +36,25 @@ export const signUp = async (req, res, next) => {
 
 export const confirmActivation = async (req, res, next) => {
     try {
-        let pendingUser = await getPendingUserByCode(req.body.confirmationCode);
-        await checkIfCodeExpired(pendingUser);
+        const pendingUser = await getPendingUserByEmail(req.body.email);
+        
+        if (!pendingUser) {
+            throw new BankError("Registration time expired", 410);
+        }
+
+        if (pendingUser.confirmationCode !== req.body.confirmationCode) {
+            throw new BankError("Incorrect code", 400);
+        }
+
+        const isCodeExpired =  checkIfCodeExpired(pendingUser);
+        if (isCodeExpired) {
+            throw new BankError("Confirmation code expired", 403);
+        }
+
         let {_id : email, firstName, lastName, phone, password } = pendingUser;
         await addUser({email, firstName, lastName, phone, password});
-        await deletePendingUserByCode(pendingUser.confirmationCode);
-        res.status(202).json({msg: "Account cofirmed", success: true})
+        await deletePendingUserByEmail(req.body.email);
+        res.status(202).json({message: "Account cofirmed", success: true})
     } catch (error) {
         next(error);
     }
@@ -51,9 +62,12 @@ export const confirmActivation = async (req, res, next) => {
 
 export const resendActivation = async (req, res, next) => {
     try {
-        const email = req.body.email;
-        let pendingUser = await getPendingUserByEmail(email);
-        await checkIfCodeExpired(pendingUser);
+        const { email }  = req.body;
+        const pendingUser = await getPendingUserByEmail(email);
+        if (!pendingUser) {
+            throw new BankError("Registration time expired", 410);
+        }
+
         const extendedExpTime = calculateExpirationTime();
         const otp = generateConfirmationCode();
         const update = { expiration: extendedExpTime, confirmationCode: otp };
@@ -61,19 +75,25 @@ export const resendActivation = async (req, res, next) => {
         sendConfirmationCode(email, otp);
         res.status(200).json({
             success: true,
-            msg: "Confirmation code resent"
-            //     confirmationCode: otp
+            message: "Confirmation code resent"
         });
     } catch (err) {
         next(err)
     }
 }
 
-async function checkIfCodeExpired(pendingUser) {
-    if (pendingUser.expiration < Date.now()) {
-        await deletePendingUserByCode(pendingUser.confirmationCode);
-        throw new BankError("Confirmation code expired", 400);
+export const cancelRegistration = async (req, res, next) => {
+    try {
+        console.log(req?.body);
+        await deletePendingUserByEmail(req.body.email);
+        res.status(200).json({success: true, message: "Registration Cancelled"});
+    } catch (err) {
+        next(err);
     }
+}
+
+function checkIfCodeExpired(pendingUser) {
+    return (pendingUser.expiration < Date.now());
 }
 
 async function hashPassword(password) {

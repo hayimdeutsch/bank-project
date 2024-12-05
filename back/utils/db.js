@@ -157,22 +157,6 @@ export const addPendingUser = async function (user) {
   }
 }
 
-export const getPendingUserByCode = async function (code) {
-  let user = null;
-
-  try {
-    user = await PendingUser.findOne({confirmationCode: code});    
-  } catch (err) {
-    throw new BankError("DB Error", 500);
-  }
-
-  if (!user) {
-    throw new BankError("Invalid code", 400);
-  }
-    
-    return user;
-};
-
 export const getPendingUserByEmail = async function (email) {
   let user = null;
 
@@ -181,24 +165,17 @@ export const getPendingUserByEmail = async function (email) {
   } catch (err) {
     throw new BankError("DB Error", 500);
   }
-
-  if (!user) {
-    throw new BankError("Invalid email", 400);
-  }
     
-    return user;
+  return user;
 }
 
-export const deletePendingUserByCode = async function (code) {
-  let deleted = null;
+export const deletePendingUserByEmail = async function (email) {
   try {
-    deleted = await PendingUser.deleteOne({confirmationCode: code});
+    console.log(email);
+    deleted = await PendingUser.findByIdAndDelete(email);
+    console.log("deleted.deleteCount", deleted)
   } catch (err) {
     throw new BankError("DB Error", 500)
-  }
-
-  if (deleted.deletedCount == 0) {
-    throw new BankError("Invalid Code", 400)
   }
 }
 
