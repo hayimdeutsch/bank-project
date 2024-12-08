@@ -56,7 +56,6 @@ export default function Signup() {
     <Box
       className="SignupForm"
       sx={{
-        backgroundColor: "background.default",
         color: "text.primary",
         display: "flex",
         flexDirection: "column",

@@ -17,6 +17,18 @@
   padding: 2% 10%;
 }
 
+.main-content::before {    
+  content: "";
+  background-image: url("/Background.png");
+  background-size: cover;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  opacity: 0.2
+}
+
 .Header {
   padding: 1px 10%;
 }
@@ -25,5 +37,4 @@
   background-color: #333;
   color: white;
   align-items: center;
-  text-align: center;
 }

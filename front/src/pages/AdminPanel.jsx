@@ -8,7 +8,7 @@ import submitForm from "../utils/submitForm";
 
 export default function AdminPanel() {
   const [users, setUsers] = useState([]);
-  const [sendingError, setSendingError] = useState(null);
+  const [sendingError, setSendingError] = useState("");
   const [selectedUserEmail, setSelectedUserEmail] = useState("");
   const [depositAmount, setDepositAmount] = useState("");
   const [rowSelectionModel, setRowSelectionModel] = useState([]);
@@ -99,7 +99,8 @@ export default function AdminPanel() {
       sortable: true,
       resizable: false,
       flex: 0.15,
-      valueGetter: (balance) => formatCurrency(balance),
+      renderCell: (params) => formatCurrency(params.row?.balance),
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
     },
   ];
 

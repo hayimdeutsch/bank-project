@@ -15,19 +15,19 @@ export const addUser = async function (user) {
   try {
     await newUser.validate(["_id"]);
   } catch(err) {
-    throw new BankError("Email already taken", 409)
+    throw new BankError("Email already taken", 409, err);
   }
 
   try {
     await newUser.validate();
   } catch(err) {
-    throw new BankError("Invalid Input", 400);
+    throw new BankError("Invalid Input", 400, err);
   }
 
   try {
     await newUser.save();
   } catch (err) {
-    throw new BankError("DB Error", 500);
+    throw new BankError("DB Error", 500, err);
   }
 }
 
@@ -37,7 +37,7 @@ export const getUserByEmail = async function (email) {
   try {
     user = await User.findOne({_id: email});    
   } catch (err) {
-    throw new BankError("DB Error", 500);
+    throw new BankError("DB Error", 500, err);
   }
   
   return user;
@@ -53,7 +53,7 @@ export const getUserTransactionsByEmail = async function (email) {
         options: { getters: true },
     }).exec();
   } catch (err) {
-    throw new BankError("DB Error", 500);
+    throw new BankError("DB Error", 500, err);
   }
 
   if (!userTransactions) {
@@ -78,7 +78,7 @@ export const getAllUsers = async function () {
 
     return users;
   } catch (err) {
-    throw new BankError("DB Error", 500);
+    throw new BankError("DB Error", 500, err);
   }
 }
 
@@ -103,7 +103,7 @@ export const postTransaction = async function (from, to, amount) {
         await session.commitTransaction()
     } catch (err) {
         await session.abortTransaction();
-        throw new BankError("DB Error", 500);
+        throw new BankError("DB Error", 500, err);
     } finally {
         session.endSession()
     }
@@ -119,7 +119,7 @@ export const postDeposit = async function (user, amount) {
   try {
     await transaction.validate();
   } catch(err) {
-    throw new BankError("Invalid Input", 400);
+    throw new BankError("Invalid Input", 400, err);
   }
 
   let session = await mongoose.connection.startSession();
@@ -135,7 +135,7 @@ export const postDeposit = async function (user, amount) {
   } catch (err) {
     console.log(err);
     await session.abortTransaction();
-    throw new BankError("DB Error", 500);
+    throw new BankError("DB Error", 500, err);
   } finally {
     session.endSession();
   } 
@@ -147,13 +147,13 @@ export const addPendingUser = async function (user) {
   try {
     await newUser.validate();
   } catch(err) {
-    throw new BankError("Invalid input", 400);
+    throw new BankError("Invalid input", 400, err);
   }
 
   try {
     await newUser.save();
   } catch (err) {
-    throw new BankError("DB Error", 500);
+    throw new BankError("DB Error", 500, err);
   }
 }
 
@@ -163,7 +163,7 @@ export const getPendingUserByEmail = async function (email) {
   try {
     user = await PendingUser.findById(email);    
   } catch (err) {
-    throw new BankError("DB Error", 500);
+    throw new BankError("DB Error", 500, err);
   }
     
   return user;
@@ -171,11 +171,9 @@ export const getPendingUserByEmail = async function (email) {
 
 export const deletePendingUserByEmail = async function (email) {
   try {
-    console.log(email);
-    deleted = await PendingUser.findByIdAndDelete(email);
-    console.log("deleted.deleteCount", deleted)
+    const deleted = await PendingUser.findByIdAndDelete(email);
   } catch (err) {
-    throw new BankError("DB Error", 500)
+    throw new BankError("DB Error", 500, err)
   }
 }
 
@@ -188,7 +186,7 @@ export const updatePendingUserByEmail = async function (email, update) {
       }
     )
   } catch (err) {
-    throw new BankError("DB Error", 500)
+    throw new BankError("DB Error", 500, err)
   }
 
   if (!user) {
@@ -202,6 +200,6 @@ export const checkIfEmailTaken = async function (email) {
     const existingPendingUser = await PendingUser.findById(email);
     return (existingUser || existingPendingUser);
   } catch (err) {
-    throw new BankError("DB Error", 500)
+    throw new BankError("DB Error", 500, err)
   }
 }

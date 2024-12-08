@@ -17,7 +17,6 @@ export default function Home() {
       justifyContent={"space-evenly"}
       sx={{
         padding: 4,
-        backgroundColor: "background.default",
         color: "text.primary",
       }}
     >
