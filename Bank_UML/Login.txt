@@ -1,0 +1,53 @@
+title Sign Up
+
+participant Mobile
+participant Front
+participant Back
+database Database
+activate Front
+
+Front->Back: GET /
+activate Back
+Front<--Back: HTTP 200 OK \n index.html
+deactivate Back
+Front->Back:GET /signup
+Front<--Back: HTTP 200 OK \n signup.html
+
+
+Front->Front: validate input
+alt invalid input
+Front -> Front: Error Message
+end
+Front->Back:<align:center>POST /api/ver/signup\nBody: user info + password</align>
+Back->Database:Register User
+
+
+alt email taken
+Database -> Back:<align:center>Registration failed\nEmail Taken</align>
+Back ->Front: HTTP 409 Already Exists
+Front->Front: Error Message
+end
+
+Database->Back:<align:center>Registration Succeeded\n activation field = false</align>
+Back -> Front:HTTP 200 OK 
+Back->Mobile: SMS - Confirmation Code
+
+
+Front->Back:<align:center>POST api/ver/signup/confirmation\nConfirmation Code</align>
+
+Back->Database: validate code
+
+
+alt 
+Database->Back: Wrong code
+Back->Front: HTTP 400 wrong code
+end
+
+Database->Back: Valid Code
+Back ->Database:User.activated = true
+Back->Back: Generate Token
+Back -> Front: HTTP 201 Created + \n           token
+
+Front->Back: GET /dashboard + token
+
+deactivate Front

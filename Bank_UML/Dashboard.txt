@@ -1,0 +1,34 @@
+title Dashboard
+
+participant Front
+participant Back
+database Database
+
+
+Front->Back: <align:center>GET /dashboard + token</align>
+Back->Back: <align:center>Decrypt and \nvalidate token</align>
+alt invalid token
+Back->Back: expired/invalid token
+Back ->Front: <align:center>HTTP 403 Forbidden</align>
+Front->Front: GET /
+end
+
+Back->Database: retrieve user details
+Back -> Back: <align:center>render dashboard \nwith user details</align>
+Back->Front: <align:center>HTTP 200 OK \n Body: dashboard.html</align>
+
+loop 
+Front->Back: <align:center>GET /dashboard/token \nBearer: token</align>
+
+alt invalid token
+Back->Back: expired/invalid token
+Back ->Front: <align:center>HTTP 403 Forbidden</align>
+Front->Front: GET /
+end
+
+Back->Front: HTTP 200 OK + token
+end
+
+Front->Front: <align:center>Logout\nErase Token</align>
+Front->Back: GET /
+Back->Front: <align:center>HTTP 200 OK\nBody: index.html</align>
