@@ -12,14 +12,14 @@ export default function ActivityTable({ refresh }) {
   const [transactions, setTransactions] = useState([]);
   let { activeUser } = useAuthContext();
   let { data: transactionData } = useProtectedFetch(
-    "api/v1/user/transactions",
+    "/user/transactions",
     refresh
   );
   let {
     loading: loadingBalance,
     error: balanceError,
     data: balance,
-  } = useProtectedFetch("api/v1/user/balance", refresh);
+  } = useProtectedFetch("/user/balance", refresh);
 
   useEffect(() => {
     if (transactionData) {

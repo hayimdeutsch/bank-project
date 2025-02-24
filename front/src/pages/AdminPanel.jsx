@@ -16,7 +16,7 @@ export default function AdminPanel() {
   let privateAxios = useAxiosProtected();
 
   let { loading, error, data } = useProtectedFetch(
-    "api/v1/admin/users",
+    "/admin/users",
     refresh
   );
 
@@ -33,7 +33,7 @@ export default function AdminPanel() {
     }
 
     try {
-      let response = await submitForm(e, "api/v1/admin/deposits", privateAxios);
+      let response = await submitForm(e, "/admin/deposits", privateAxios);
       setSelectedUserEmail("");
       setDepositAmount("");
       setRefresh((prev) => prev + 1);

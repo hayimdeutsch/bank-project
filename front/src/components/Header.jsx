@@ -66,7 +66,7 @@ export default function Header() {
             <LoginForm
               open={isLoggingIn}
               setOpen={setIsLoggingIn}
-              submitTo={"api/v1/login"}
+              submitTo={"/login"}
               next={"/dashboard"}
             />
           </>

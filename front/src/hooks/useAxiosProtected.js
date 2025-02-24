@@ -31,7 +31,7 @@ export default () => {
           reqConfig.isRetry = true;
           try {
             const refreshResopnse = await axios.post(
-              "/api/v1/refresh", 
+              "/refresh", 
               {refreshToken},
             );
             const accessToken = refreshResopnse?.data?.accessToken;

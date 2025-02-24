@@ -18,6 +18,7 @@ import {
 
 export default function Signup() {
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isValidSignUp, setIsValidSignUp] = useState(false);
   const [formData, setFormData] = useState({
@@ -28,12 +29,6 @@ export default function Signup() {
     password: "",
   });
 
-  useEffect(() => {
-    if (formData.email) {
-      localStorage.setItem("userEmail", formData.email);
-    }
-  }, [formData.email]);
-
   const handleChange = (event) => {
     setError("");
     const { name, value } = event.target;
@@ -42,11 +37,19 @@ export default function Signup() {
 
   const handleSubmit = async (event) => {
     try {
-      await sendForm(event, "api/v1/signup", axios);
+      event.preventDefault();
+      setLoading(true);
+      const token = localStorage.getItem("registrationToken");
+      const response = await axios.post("/signup", { ...formData, token });
+      localStorage.setItem("registrationToken", response.data.token);
+      setLoading(false);
       setIsValidSignUp(true);
     } catch (error) {
+      setLoading(false);
       if (error.status === 400 || error.status === 409) {
         setError(error?.response?.data?.message || "");
+      } else {
+        setError("Something went wrong. Please try again later.");
       }
       console.error("Signup error:", error);
     }

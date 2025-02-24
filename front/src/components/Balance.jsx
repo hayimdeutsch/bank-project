@@ -3,7 +3,7 @@ import useProtectedFetch from "../hooks/useProtectedFetch";
 import formatCurrency from "../utils/formatCurrency";
 export default function Balance({ refresh }) {
   let { loading, error, data } = useProtectedFetch(
-    "api/v1/user/balance",
+    "/user/balance",
     refresh
   );
   return (

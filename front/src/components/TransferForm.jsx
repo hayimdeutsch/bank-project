@@ -12,7 +12,7 @@ export default function TransferForm({ setRefresh }) {
 
   const handleSubmit = async (e) => {
     try {
-      let res = await submitForm(e, "/api/v1/user/transactions", privateAxios);
+      let res = await submitForm(e, "/user/transactions", privateAxios);
       if (res.status === 200) {
         setRefresh((prev) => prev + 1);
         setTo("");

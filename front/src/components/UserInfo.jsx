@@ -22,12 +22,12 @@ export default function UserInfo({ refresh }) {
     loading: loadingInfo,
     error: infoError,
     data: userInfo,
-  } = useProtectedFetch("api/v1/user/info");
+  } = useProtectedFetch("/user/info");
   let {
     loading: loadingBalance,
     error: balanceError,
     data: balance,
-  } = useProtectedFetch("api/v1/user/balance", refresh);
+  } = useProtectedFetch("/user/balance", refresh);
 
   return (
     // <Box sx={{ width: "100%", height: "100%" }}>
