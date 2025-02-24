@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "../utils/api";
 import submitForm from "../utils/submitForm";
 import { useAuthContext } from "../context/UserContext";
@@ -145,6 +145,15 @@ export default function AdminLogin() {
             Login
           </Button>
         </form>
+        <Button
+          variant="outlined"
+          fullWidth
+          component={Link}
+          to="/"
+          sx={{ mt: 2 }}
+        >
+          Return to Home
+        </Button>
       </Box>
     </Box>
   );

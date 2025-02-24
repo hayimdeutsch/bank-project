@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../context/UserContext";
 import { AppBar, Button, Toolbar, Typography, Box } from "@mui/material";
 import LoginForm from "../components/LoginForm";
@@ -60,15 +60,25 @@ export default function Header() {
             >
               <NavLink to={next}>MO Bank</NavLink>
             </Typography>
-            <Button color={"inherit"} size="small" onClick={handleOpen}>
-              <Typography variant="h6">Login</Typography>
-            </Button>
-            <LoginForm
-              open={isLoggingIn}
-              setOpen={setIsLoggingIn}
-              submitTo={"/login"}
-              next={"/dashboard"}
-            />
+            <Box display={"flex"} flexDirection={"row"} gap={2}>
+              <Button color={"inherit"} size="small" onClick={handleOpen}>
+                <Typography variant="h6">Login</Typography>
+              </Button>
+              <Button
+                color={"inherit"}
+                size="small"
+                component={Link}
+                to="/admin/login"
+              >
+                <Typography variant="h6">Admin Login</Typography>
+              </Button>
+              <LoginForm
+                open={isLoggingIn}
+                setOpen={setIsLoggingIn}
+                submitTo={"/login"}
+                next={"/dashboard"}
+              />
+            </Box>
           </>
         )}
       </Toolbar>
