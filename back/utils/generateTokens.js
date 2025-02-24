@@ -1,27 +1,33 @@
-import jwt from 'jsonwebtoken';
-import { accessTokenExpiration, refreshTokenExpiration } from '../config.js';
+import jwt from "jsonwebtoken";
+import {
+  codeExpiryMins,
+  accessTokenExpiration,
+  refreshTokenExpiration,
+} from "../config.js";
 
-const generateTokens = function (res, email) {
-  const accessToken = jwt.sign(
-    {"email": email}, 
-    process.env.ACCESS_TOKEN_SECRET, 
-    { expiresIn: accessTokenExpiration }
-  );
-
-  const refreshToken = jwt.sign(
-    {"email": email}, 
-    process.env.REFRESH_TOKEN_SECRET, 
-    {expiresIn: refreshTokenExpiration }
-  );
-
-  res.cookie("accessToken", accessToken, {
-    httpOnly: true,
+export function generateRegistrationToken(email) {
+  return jwt.sign({ email: email }, process.env.REGISTRATION_TOKEN_SECRET, {
+    expiresIn: codeExpiryMins * 60,
   });
-  
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-  })
-  return ({ accessToken, refreshToken });
 }
+
+export function generateAccessToken(email) {
+  return jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: accessTokenExpiration,
+  });
+}
+
+export function generateRefreshToken(email) {
+  return jwt.sign({ email: email }, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: refreshTokenExpiration,
+  });
+}
+
+const generateTokens = function (email) {
+  const accessToken = generateAccessToken(email);
+  const refreshToken = generateRefreshToken(email);
+
+  return { accessToken, refreshToken };
+};
 
 export default generateTokens;

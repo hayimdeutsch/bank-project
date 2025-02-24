@@ -1,3 +1,4 @@
+import "dotenv/config";
 import mongoose from "mongoose";
 import nodemailer from "nodemailer";
 
@@ -16,12 +17,13 @@ const transporter = nodemailer.createTransport({
 });
 
 const corsOptions = {
+    origin: process.env.FRONTEND_URL,
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
 }
 
 const codeExpiryMins = 5;
 const expirationTime = codeExpiryMins * 60 * 1000;
-const cleanUpInterval = 60 * 60 * 1000;
 const accessTokenExpiration = '15m';
 const refreshTokenExpiration = '3h';
 
@@ -30,7 +32,6 @@ export {
     transporter, 
     codeExpiryMins, 
     expirationTime, 
-    cleanUpInterval,
     accessTokenExpiration,
     refreshTokenExpiration,
     corsOptions
