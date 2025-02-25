@@ -1,0 +1,31 @@
+title Dashboard
+
+participant Front
+participant Back
+database Database
+
+
+Front->Back: <align:center>GET /user/info \nBearer 'access token'</align>
+Back->Back: <align:center>Decrypt and \nvalidate token</align>
+
+alt valid access token
+Back->Database: retrieve user details
+Back->Front: <align:center>HTTP 200 OK \n Body:User Info</align>
+else invalid access
+Back ->Front: <align:center>HTTP 403 Forbidden</align>
+Front->Back: POST /token/refresh \n Body: refresh token
+Back->Back: Decrypt and \nvalidate token
+alt valid refresh token
+Back->Front: HTTP 200 OK\nBody: new tokens
+Front->Back: <align:center>GET /user/info \nBearer 'access token'</align>
+Back->Database: retrieve user details
+Back->Front: <align:center>HTTP 200 OK \n Body:User Info</align>
+else invalid/expired refresh token
+Back->Front: HTTP 401 Unauthorized
+Front->Front: Navigate /
+end
+end
+
+Front->Front: <align:center>Logout\nErase Token</align>
+Front->Back: GET /
+Back->Front: <align:center>HTTP 200 OK\nBody: index.html</align>
